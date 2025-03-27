@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.time.LocalDate;
@@ -58,10 +59,8 @@ public class CrawlingService extends AbstractCrawlingService {
      */
     public void startCrawling(String sourceName) {
 
-        logger.info(sourceName);
-        logger.info("[{}]", sourceConfigMap);
-        logger.info("Current config: {}", sourceConfigMap.get(sourceName.toUpperCase()));
-        this.currentConfig = sourceConfigMap.get(sourceName.toUpperCase());
+        logger.info("Current config: {}", sourceConfigMap.get(sourceName.toLowerCase()));
+        this.currentConfig = sourceConfigMap.get(sourceName.toLowerCase());
 
         logger.info(this.currentConfig.toString());
         if (this.currentConfig == null) {
