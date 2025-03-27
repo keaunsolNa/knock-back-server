@@ -160,4 +160,16 @@ public class UserController {
     {
         return ResponseEntity.ok(userService.getSubscribeList(genre));
     }
+
+    /**
+     * 유저 디바이스 토큰 정보 저장
+     * @param valueMap : 토큰 정보 JSON 형태
+     * @return : 저장 성공 여부
+     */
+    @PostMapping("/saveToken")
+    public ResponseEntity<Boolean> saveDeviceToken(@RequestBody Map<String, String> valueMap)
+    {
+        return ResponseEntity.ok(userService.saveDeviceToken(valueMap.get("targetToken")));
+    }
+
 }

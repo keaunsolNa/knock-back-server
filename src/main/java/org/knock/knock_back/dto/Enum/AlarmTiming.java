@@ -10,12 +10,10 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum AlarmTiming {
-    ZERO_HOUR,
-    ONE_HOUR,
-    THR_HOUR,
-    SIX_HOUR,
-    TWE_HOUR,
+    NONE,
+    ZERO_DAY,
     ONE_DAY,
     THR_DAY,
-    SEV_DAY
+    SEV_DAY,
+    TEN_DAY
 }

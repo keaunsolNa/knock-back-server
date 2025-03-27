@@ -349,6 +349,34 @@ public class UserService {
         return returnValue.toArray(new String[0]);
     }
 
+
+    /**
+     * 로그인한 유저의 deviceToken을 유저에 저장한다.
+     * @param targetToken : deviceToken 값
+     * @return : 저장 성공 여부
+     */
+    public Boolean saveDeviceToken(String targetToken) {
+
+        try
+        {
+
+            SSO_USER_INDEX user = (SSO_USER_INDEX) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+            if (null == user.getDeviceToken() || user.getDeviceToken().isEmpty()) user.setDeviceToken(new HashSet<>());
+
+            user.getDeviceToken().add(targetToken);
+
+            return true;
+        }
+
+        catch (Exception e)
+        {
+            logger.debug(e.getMessage());
+            return false;
+        }
+
+    }
+
     /**
      * MOVIE, PERFORMING_ARTS 등의 카테고리 index 변경
      * @param target : 변경할 category
@@ -462,4 +490,6 @@ public class UserService {
 
         return null;
     }
+
+
 }

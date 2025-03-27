@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.knock.knock_back.repository.performingArts.KOPISRepository;
 import org.knock.knock_back.service.crawling.common.CrawlingService;
 import org.knock.knock_back.service.crawling.performingArts.KOPIS;
+import org.knock.knock_back.service.fcm.FcmService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,7 @@ public class SchedulerConfig {
     private final KOPIS kopis;
     private final CrawlingService crawlingService;
     private final KOPISRepository kopisRepository;
+    private final FcmService fcmService;
 
     @Value("${schedule.kofic.use}")
     private boolean useScheduleKOFIC;
@@ -40,6 +42,29 @@ public class SchedulerConfig {
 
     @Value("${schedule.lotte.use}")
     private boolean useScheduleLotte;
+
+    @Value("${schedule.fcm.use}")
+    private boolean useScheduleFCM;
+
+    /**
+     * 주기적으로 KOFIC 에서 영화 정보를 받아온다.
+     * @apiNote cronTab = 1시간에 1번, 정시
+     */
+    @Scheduled(cron = "${schedule.fcm.cron}")
+    public void fcmJob() {
+
+        try
+        {
+            if (useScheduleFCM)
+            {
+                fcmService.pushMsg();
+            }
+        }
+        catch (Exception e)
+        {
+            logger.debug("[{}] KOFIC 크롤링 중 에러 : ", e.getMessage());
+        }
+    }
 
     /**
      * 주기적으로 KOFIC 에서 영화 정보를 받아온다.
