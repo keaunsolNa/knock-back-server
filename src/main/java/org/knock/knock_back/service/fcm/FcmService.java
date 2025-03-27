@@ -69,7 +69,7 @@ public class FcmService {
         FirebaseMessaging.getInstance().send(Message.builder()
                 .setNotification(Notification.builder()
                         .setTitle("Test Title")
-                        .setBody("Test Body")
+                        .setBody("Test")
                         .build())
                 .setToken(token)
                 .build());
