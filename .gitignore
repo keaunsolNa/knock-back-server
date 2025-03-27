@@ -339,7 +339,5 @@ frontend/package-lock.json
 /build/*
 /.gradle/*
 
-!knock_back-0.0.1-SNAPSHOT.jar
-!build/libs/knock_back-0.0.1-SNAPSHOT.jar
 !gradle/wrapper/gradle-wrapper.jar
 /src/main/resources/key/knock-150a4-firebase-adminsdk-fbsvc-932aac69c8.json
