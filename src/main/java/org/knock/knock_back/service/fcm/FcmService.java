@@ -10,18 +10,16 @@ import com.google.firebase.messaging.Notification;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
 public class FcmService {
-
-    // 비밀키 경로 환경 변수 ( 필수 )
-    @Value("${fcm.service-account-file}")
-    private String serviceAccountFilePath;
 
     // topic 이름 환경 변수
     @Value("${fcm.topic-name}")
@@ -35,9 +33,19 @@ public class FcmService {
     // 의존성 주입이 이루어진 후 초기화를 수행한다.
     @PostConstruct
     public void initialize() throws IOException {
+
+        String firebaseJson = System.getenv("FCM_CREDENTIALS_JSON");
+        if (firebaseJson == null) {
+            throw new IllegalStateException("Missing FCM_CREDENTIALS_JSON env var");
+        }
+        File tempFile = File.createTempFile("firebase", ".json");
+        try (FileWriter writer = new FileWriter(tempFile)) {
+            writer.write(firebaseJson);
+        }
+
         //Firebase 프로젝트 정보를 FireBaseOptions에 입력해준다.
         FirebaseOptions options = FirebaseOptions.builder()
-                .setCredentials(GoogleCredentials.fromStream(new ClassPathResource(serviceAccountFilePath).getInputStream()))
+                .setCredentials(GoogleCredentials.fromStream(new FileInputStream(tempFile)))
                 .setProjectId(projectId)
                 .build();
 

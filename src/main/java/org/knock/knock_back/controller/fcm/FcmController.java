@@ -1,4 +1,4 @@
-package org.knock.knock_back.controller;
+package org.knock.knock_back.controller.fcm;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
 import org.knock.knock_back.dto.dto.fcm.MessageRequestDTO;
