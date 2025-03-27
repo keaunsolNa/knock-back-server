@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/message/fcm")
 public class FcmController {
@@ -27,8 +29,8 @@ public class FcmController {
     }
     // fcm를 보낸다 ( token )
     @PostMapping("/token")
-    public ResponseEntity<Object> sendMessageToken(@RequestBody MessageRequestDTO requestDTO) throws FirebaseMessagingException{
-        fcmService.sendMessageByToken(requestDTO.getTitle(), requestDTO.getBody(), requestDTO.getTargetToken());
+    public ResponseEntity<Object> sendMessageToken(@RequestBody Map<String, String> valueMap) throws FirebaseMessagingException{
+        fcmService.sendMessageByToken( valueMap.get("targetToken ") );
         return ResponseEntity.ok().build();
     }
 
