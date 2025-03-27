@@ -58,6 +58,8 @@ public class CrawlingService extends AbstractCrawlingService {
      */
     public void startCrawling(String sourceName) {
 
+        logger.info(sourceName);
+        logger.info("[{}]", sourceConfigMap);
         logger.info("Current config: {}", sourceConfigMap.get(sourceName.toUpperCase()));
         this.currentConfig = sourceConfigMap.get(sourceName.toUpperCase());
 
