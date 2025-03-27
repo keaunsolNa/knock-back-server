@@ -1,0 +1,7 @@
+build:
+  buildpacks:
+    - heroku/gradle
+  config:
+    JDK_VERSION: 17
+  run:
+    web: sh knock_back/gradlew -p knock_back bootRun
