@@ -33,11 +33,7 @@ public class FcmController {
     @PostMapping("/token")
     public ResponseEntity<Object> sendMessageToken(@RequestBody Map<String, String> valueMap) throws FirebaseMessagingException{
 
-        System.out.println(valueMap);
-        System.out.println(valueMap.get("targetToken"));
-        log.info(valueMap.get("targetToken"));
-        log.info("[{}]", valueMap);
-        fcmService.sendMessageByToken( valueMap.get("targetToken ") );
+        fcmService.sendMessageByToken( valueMap.get("targetToken") );
         return ResponseEntity.ok().build();
     }
 
