@@ -1,0 +1,16 @@
+# Base image: Use an OpenJDK image suitable for Spring Boot applications
+FROM openjdk:23-jdk-slim
+
+# Set working directory inside the container
+WORKDIR /app
+
+# Copy the built JAR file from the host to the container
+# Assume the JAR file is located in the build/libs directory after building the project
+COPY . .
+
+# Expose the application port (change this if your Spring Boot app uses a different port)
+EXPOSE 53287
+
+# Run the JAR file
+
+CMD ["java", "-jar", "knock_back.jar"]
