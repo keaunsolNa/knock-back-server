@@ -54,54 +54,57 @@ public class KOPIS {
 
     @Async
     public CompletableFuture<List<KOPIS_INDEX>> requestAPIAsync() {
-
         logger.info("Running in thread: {}", Thread.currentThread().getName());
 
-        categoryLevelTwoList = new HashMap<>();
-        categoryLevelTwoRepository.findAllByParentNm(CategoryLevelOne.PERFORMING_ARTS)
-                .ifPresent(result -> result.forEach(cat -> categoryLevelTwoList.put(cat.getNm(), cat)));
+        categoryLevelTwoList = categoryLevelTwoRepository.findAllByParentNm(CategoryLevelOne.PERFORMING_ARTS)
+                .map(list -> {
+                    Map<String, CATEGORY_LEVEL_TWO_INDEX> map = new HashMap<>();
+                    list.forEach(cat -> map.put(cat.getNm(), cat));
+                    return map;
+                }).orElseGet(HashMap::new);
 
-        LocalDate today = LocalDate.now();
-        LocalDate oneYearAgo = today.minusYears(1).withMonth(1).withDayOfMonth(1);
-
-        // 원하는 형식으로 포맷터 정의 (yyyyMMdd)
+        LocalDate oneYearAgo = LocalDate.now().minusYears(1).withMonth(1).withDayOfMonth(1);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 
-        // 포맷을 적용하여 날짜를 문자열로 변환
-        String formattedDate = oneYearAgo.format(formatter);
-
-        Map<String, String> paramMap = new HashMap<>();
-        paramMap.put("service", AUTH_KEY);
-        paramMap.put("stdate", formattedDate);
-        paramMap.put("eddate", "29991231");
-        paramMap.put("rows", "100");
-        paramMap.put("cpage", "1");
+        Map<String, String> paramMap = new HashMap<>(Map.of(
+                "service", AUTH_KEY,
+                "stdate", oneYearAgo.format(formatter),
+                "eddate", "29991231",
+                "rows", "100",
+                "cpage", "1"
+        ));
 
         List<KOPIS_INDEX> allPerformances = new ArrayList<>();
 
         while (true) {
             int currentPage = Integer.parseInt(paramMap.get("cpage"));
-            if (currentPage > 3000) break;
+            if (currentPage > 100) break;
 
             String url = REQUEST_URL + "?" + makeQueryString(paramMap);
             JSONArray performanceList = fetchJSONArray(url);
 
             if (performanceList == null || performanceList.isEmpty()) {
-                paramMap.put("cpage", String.valueOf(currentPage + 1));
+                logger.warn("Page {} 응답 실패 또는 결과 없음. 종료.", currentPage);
                 break;
             }
 
-            List<KOPIS_INDEX> performances = processPerformanceList(performanceList);
-            allPerformances.addAll(performances);
+            try {
+                List<KOPIS_INDEX> performances = processPerformanceList(performanceList);
+                allPerformances.addAll(performances);
+            } catch (Exception e) {
+                logger.warn("Page {} 처리 중 예외 발생: {}", currentPage, e.getMessage());
+            }
 
             paramMap.put("cpage", String.valueOf(currentPage + 1));
-            logger.info("Page {} processed.", currentPage);
-
-            kopisRepository.saveAll(performances);
-
         }
 
-        logger.info("KOPIS 데이터 수집 완료");
+        try {
+            kopisRepository.saveAll(allPerformances);
+            logger.info("총 {}건 저장 완료", allPerformances.size());
+        } catch (Exception e) {
+            logger.error("bonsai 저장 중 오류 발생: {}", e.getMessage());
+        }
+
         return CompletableFuture.completedFuture(allPerformances);
     }
 
@@ -114,11 +117,12 @@ public class KOPIS {
                     .timeout(Duration.ofSeconds(10))
                     .block();
 
-            assert xml != null;
+            if (xml == null || xml.isBlank()) return null;
+
             JSONObject jsonObject = XML.toJSONObject(xml);
             return jsonObject.getJSONObject("dbs").optJSONArray("db");
         } catch (Exception e) {
-            logger.warn("API 응답 처리 실패: {}", e.getMessage());
+            logger.warn("API 응답 실패: {}", e.getMessage());
             return null;
         }
     }
@@ -144,6 +148,7 @@ public class KOPIS {
             performance.setCode(mt20id);
             performance.setCategoryLevelOne(CategoryLevelOne.PERFORMING_ARTS);
             performance.setCategoryLevelTwo(category);
+
             fetchPerformanceDetails(performance);
             performanceEntities.add(performance);
         }
@@ -154,9 +159,15 @@ public class KOPIS {
     private void fetchPerformanceDetails(KOPIS_INDEX performance) {
         try {
             String url = REQUEST_URL + "/" + performance.getCode() + "?service=" + AUTH_KEY;
-            String xml = webClient.get().uri(url).retrieve().bodyToMono(String.class).timeout(Duration.ofSeconds(10)).block();
+            String xml = webClient.get()
+                    .uri(url)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .timeout(Duration.ofSeconds(10))
+                    .block();
 
-            assert xml != null;
+            if (xml == null || xml.isBlank()) return;
+
             JSONObject detailJson = XML.toJSONObject(xml).getJSONObject("dbs").getJSONObject("db");
 
             performance.setName(detailJson.optString("prfnm"));
@@ -172,48 +183,51 @@ public class KOPIS {
             performance.setPrfState(PrfState.fromKorean(detailJson.optString("prfstate")));
             performance.setDtguidance(detailJson.optString("dtguidance").split(","));
 
-            Object relatesObj = detailJson.opt("relates");
-            List<String> relatesList = new ArrayList<>();
-
-            if (relatesObj instanceof JSONObject relatesJson) {
-                Object relateData = relatesJson.opt("relate");
-                if (relateData instanceof JSONArray jsonArray) {
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject r = jsonArray.optJSONObject(i);
-                        if (r != null) relatesList.add(r.optString("relatenm") + " : " + r.optString("relateurl"));
-                    }
-                } else if (relateData instanceof JSONObject r) {
-                    relatesList.add(r.optString("relatenm") + " : " + r.optString("relateurl"));
-                }
-            }
-
-            performance.setRelates(relatesList.toArray(new String[0]));
-
-            Object styUrlsObject = detailJson.opt("styurls");
-            List<String> styUrlList = new ArrayList<>();
-
-            if (styUrlsObject instanceof JSONObject jsonObj) {
-                Object styurlRaw = jsonObj.opt("styurl");
-                if (styurlRaw instanceof JSONArray arr) {
-                    for (int i = 0; i < arr.length(); i++) {
-                        String urlStr = arr.optString(i);
-                        if (urlStr != null && !urlStr.isBlank()) styUrlList.add(urlStr);
-                    }
-                } else if (styurlRaw instanceof String str) {
-                    if (!str.isBlank()) styUrlList.add(str);
-                }
-            }
-
-            performance.setStyurls(styUrlList.toArray(new String[0]));
-
-            String runTime = detailJson.optString("prfruntime");
-            int time = 0;
-            if (runTime.contains("시간")) time = Integer.parseInt(runTime.split("시간")[0].trim()) * 60;
-            if (runTime.contains("분")) time += Integer.parseInt(runTime.replaceAll(".*시간", "").replace("분", "").trim());
-            performance.setRunningTime((long) time);
+            performance.setRelates(extractRelates(detailJson.opt("relates")));
+            performance.setStyurls(extractStyUrls(detailJson.opt("styurls")));
+            performance.setRunningTime(parseRuntime(detailJson.optString("prfruntime")));
 
         } catch (Exception e) {
             logger.warn("상세정보 조회 실패 ({}): {}", performance.getCode(), e.getMessage());
         }
+    }
+
+    private String[] extractRelates(Object relatesObj) {
+        List<String> relatesList = new ArrayList<>();
+        if (relatesObj instanceof JSONObject relatesJson) {
+            Object relateData = relatesJson.opt("relate");
+            if (relateData instanceof JSONArray jsonArray) {
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject r = jsonArray.optJSONObject(i);
+                    if (r != null) relatesList.add(r.optString("relatenm") + " : " + r.optString("relateurl"));
+                }
+            } else if (relateData instanceof JSONObject r) {
+                relatesList.add(r.optString("relatenm") + " : " + r.optString("relateurl"));
+            }
+        }
+        return relatesList.toArray(new String[0]);
+    }
+
+    private String[] extractStyUrls(Object styUrlsObject) {
+        List<String> styUrlList = new ArrayList<>();
+        if (styUrlsObject instanceof JSONObject jsonObj) {
+            Object styurlRaw = jsonObj.opt("styurl");
+            if (styurlRaw instanceof JSONArray arr) {
+                for (int i = 0; i < arr.length(); i++) {
+                    String urlStr = arr.optString(i);
+                    if (urlStr != null && !urlStr.isBlank()) styUrlList.add(urlStr);
+                }
+            } else if (styurlRaw instanceof String str) {
+                if (!str.isBlank()) styUrlList.add(str);
+            }
+        }
+        return styUrlList.toArray(new String[0]);
+    }
+
+    private long parseRuntime(String runTime) {
+        int time = 0;
+        if (runTime.contains("시간")) time = Integer.parseInt(runTime.split("시간")[0].trim()) * 60;
+        if (runTime.contains("분")) time += Integer.parseInt(runTime.replaceAll(".*시간", "").replace("분", "").trim());
+        return time;
     }
 }
