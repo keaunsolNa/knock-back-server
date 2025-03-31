@@ -93,7 +93,18 @@ public class ConvertDTOAndIndex {
         dto.setOpeningTime(stringDateConvertLongTimeStamp.Converter(index.getOpeningTime()));
         dto.setKOFICCode(index.getKOFICCode());
         dto.setReservationLink(index.getReservationLink());
-        dto.setPosterBase64(index.getPosterBase64());
+
+        if (index.getPosterBase64().contains("cf.lottecinema."))
+        {
+            SrcDirectToByteImg srcDirectToByteImg = new SrcDirectToByteImg();
+            dto.setPosterBase64(null);
+            dto.setImg(srcDirectToByteImg.srcImgPathToByteImg(index.getPosterBase64()));
+        }
+        else
+        {
+            dto.setPosterBase64(index.getPosterBase64());
+        }
+
         dto.setDirectors(index.getDirectors());
         dto.setActors(index.getActors());
         dto.setCompanyNm(index.getCompanyNm());
