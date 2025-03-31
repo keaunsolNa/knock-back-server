@@ -17,8 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.net.URI;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -42,8 +40,8 @@ public class CrawlingService extends AbstractCrawlingService {
 
     public void startCrawling(String sourceName) {
 
-        logger.info("Current config: {}", sourceConfigMap.get(sourceName.toLowerCase()));
-        this.currentConfig = sourceConfigMap.get(sourceName.toLowerCase());
+        logger.info("Current config: {}", sourceConfigMap.get(sourceName.toUpperCase()));
+        this.currentConfig = sourceConfigMap.get(sourceName.toUpperCase());
         if (this.currentConfig == null) {
             throw new IllegalArgumentException("Invalid source name: " + sourceName);
         }
@@ -187,21 +185,19 @@ public class CrawlingService extends AbstractCrawlingService {
 
     private void setPoster(Element element, MOVIE_DTO dto) {
         Elements imgElement = element.select(currentConfig.getPosterQuery());
+
         if (imgElement.isEmpty()) return;
 
-        try {
-            String srcPath = Objects.requireNonNull(imgElement.first()).attr(currentConfig.getPosterExtract());
-            if (srcPath.contains("//") && currentConfig.getName().equals("LOTTE")) {
-                srcPath = srcPath.replace("//", "/");
-            }
-            InputStream in = URI.create(srcPath).toURL().openStream();
-
-            byte[] imageBytes = in.readAllBytes();
-            String base64 = Base64.getEncoder().encodeToString(imageBytes);
-            dto.setPosterBase64(base64);
-        } catch (IOException e) {
-            logger.warn("포스터 다운로드 실패: {}", e.getMessage());
+        String srcPath = Objects.requireNonNull(imgElement.first()).attr(currentConfig.getPosterExtract());
+        if (srcPath.contains("//") && currentConfig.getName().equals("LOTTE")) {
+            srcPath = srcPath.replace("//", "/");
         }
+//            InputStream in = URI.create(srcPath).toURL().openStream();
+//
+//            byte[] imageBytes = in.readAllBytes();
+//            String base64 = Base64.getEncoder().encodeToString(imageBytes);
+        dto.setPosterBase64(srcPath);
+
     }
 
     private void setPlot(Element element, MOVIE_DTO dto) {
