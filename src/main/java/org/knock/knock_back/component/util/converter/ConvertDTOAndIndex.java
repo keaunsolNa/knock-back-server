@@ -97,8 +97,8 @@ public class ConvertDTOAndIndex {
         if (index.getPosterBase64().contains("cf.lottecinema."))
         {
             SrcDirectToByteImg srcDirectToByteImg = new SrcDirectToByteImg();
-            dto.setPosterBase64(null);
-            dto.setImg(srcDirectToByteImg.srcImgPathToByteImg(index.getPosterBase64()));
+            dto.setPosterBase64(index.getPosterBase64());
+//            dto.setImg(srcDirectToByteImg.srcImgPathToByteImg(index.getPosterBase64()));
         }
         else
         {
