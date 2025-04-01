@@ -133,6 +133,8 @@ public class Movie implements MovieInterface {
 
         for (MOVIE_INDEX movie : iter)
         {
+
+            if (null == movie.getCategoryLevelTwo()) continue;
             for (CATEGORY_LEVEL_TWO_INDEX category : movie.getCategoryLevelTwo())
             {
 
