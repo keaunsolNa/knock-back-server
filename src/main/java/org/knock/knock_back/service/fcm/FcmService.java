@@ -130,6 +130,7 @@ public class FcmService {
                         {
                             idList.addAll(user.getSubscribeList().get(CategoryLevelOne.MOVIE));
 
+                            logger.info("[{}]", idList);
                             for (String id : idList)
                             {
                                 MOVIE_INDEX movie = movieRepository.findById(id).orElseThrow();
@@ -150,7 +151,7 @@ public class FcmService {
                         case 2 ->
                         {
                             idList.addAll(user.getSubscribeList().get(CategoryLevelOne.PERFORMING_ARTS));
-
+                            logger.info("[{}]", idList);
                             for (String id : idList)
                             {
                                 KOPIS_INDEX kofisIndex = kopisRepository.findById(id).orElseThrow();
