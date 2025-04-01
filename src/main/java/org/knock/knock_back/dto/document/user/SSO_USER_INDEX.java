@@ -73,7 +73,7 @@ public class SSO_USER_INDEX {
     @Enumerated(EnumType.STRING)
     private Map<CategoryLevelOne, Set<String>> subscribeList;    // 구독 목록
 
-    @Field(type =FieldType.Object)
+    @Field(type = FieldType.Text)
     private Set<String> deviceToken;
 
     @Builder
