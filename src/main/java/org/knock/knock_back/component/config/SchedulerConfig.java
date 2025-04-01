@@ -53,6 +53,7 @@ public class SchedulerConfig {
     @Scheduled(cron = "${schedule.fcm.cron}")
     public void fcmJob() {
 
+        logger.info("Schedule fcm job");
         try
         {
             if (useScheduleFCM)
