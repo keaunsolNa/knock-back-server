@@ -365,6 +365,9 @@ public class UserService {
             if (null == user.getDeviceToken() || user.getDeviceToken().isEmpty()) user.setDeviceToken(new HashSet<>());
 
             user.getDeviceToken().add(targetToken);
+
+            logger.info("[{}]", user.getDeviceToken());
+
             ssoUserRepository.save(user);
 
             return true;
