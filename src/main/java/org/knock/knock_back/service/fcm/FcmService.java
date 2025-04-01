@@ -141,7 +141,7 @@ public class FcmService {
                                     logger.info("[{}} remainTime", remainTime);
                                     for (String token : user.getDeviceToken())
                                     {
-                                        sendMessageByToken(token, movie.getMovieNm() + " 개봉 D-" + remainTime +"!", "Knock 알림");
+                                        sendMessageByToken(token, movie.getMovieNm() + " 개봉 D-" + remainTime +"!", "기다리셨던 그 컨텐츠 지금 확인해보세요!");
                                     }
 
 
@@ -171,7 +171,7 @@ public class FcmService {
 
                                     for (String token : user.getDeviceToken())
                                     {
-                                        sendMessageByToken(token, kofisIndex.getName() + " 개봉 D-" + remainTime +"!", "Knock 알림");
+                                        sendMessageByToken(token, kofisIndex.getName() + " 개봉 D-" + remainTime +"!", "기다리셨던 그 컨텐츠 지금 확인해보세요!");
                                     }
                                 }
                             }
