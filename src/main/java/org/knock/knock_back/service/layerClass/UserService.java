@@ -1,6 +1,5 @@
 package org.knock.knock_back.service.layerClass;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.knock.knock_back.component.util.converter.ConvertDTOAndIndex;
 import org.knock.knock_back.dto.Enum.AlarmTiming;
@@ -365,16 +364,9 @@ public class UserService {
 
             if (null == user.getDeviceToken() || user.getDeviceToken().isEmpty()) user.setDeviceToken(new ArrayList<>());
 
-            logger.info("=============================");
-            logger.info("[{}]", targetToken);
             if (user.getDeviceToken().contains(targetToken)) return true;
             user.getDeviceToken().add(targetToken);
 
-            logger.info("[{}]", user.getDeviceToken());
-            logger.info("[{}]", user);
-            ObjectMapper objectMapper = new ObjectMapper();
-            logger.info("[{}]", objectMapper.writeValueAsString(user));
-            logger.info("=============================");
             ssoUserRepository.save(user);
 
             return true;

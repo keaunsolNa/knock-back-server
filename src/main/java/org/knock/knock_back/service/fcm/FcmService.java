@@ -98,6 +98,9 @@ public class FcmService {
 
         Iterable<SSO_USER_INDEX> allUser = ssoUserRepository.findAll();
 
+        logger.info("======================");
+        logger.info("pushMsg");
+        logger.info("======================");
         LocalDate today = LocalDate.now();
         ZonedDateTime zonedDateTime = today.atStartOfDay(ZoneId.systemDefault());
         long epochMillis = zonedDateTime.toInstant().toEpochMilli();
@@ -131,9 +134,13 @@ public class FcmService {
                             idList.addAll(user.getSubscribeList().get(CategoryLevelOne.MOVIE));
 
                             logger.info("[{}]", idList);
+                            logger.info("[{}]", minusTime);
+                            logger.info("[{}]", epochMillis);
                             for (String id : idList)
                             {
                                 MOVIE_INDEX movie = movieRepository.findById(id).orElseThrow();
+
+                                logger.info("[{}]", movie.getOpeningTime() - minusTime);
                                 if (movie.getOpeningTime() - minusTime >= epochMillis)
                                 {
                                     int remainTime = (int) ((movie.getOpeningTime() - minusTime) / 86400000L);
