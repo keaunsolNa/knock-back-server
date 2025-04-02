@@ -222,5 +222,10 @@ public class JwtTokenProvider {
             logger.error("Token is null " + exception);
             return false;
         }
+        catch (IllegalArgumentException exception)
+        {
+            logger.debug("token Can not be null " + jwtToken);
+            return false;
+        }
     }
 }
