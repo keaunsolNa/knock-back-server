@@ -134,9 +134,11 @@ public class FcmService {
                             {
                                 MOVIE_INDEX movie = movieRepository.findById(id).orElseThrow();
 
-                                if (movie.getOpeningTime() - minusTime >= epochMillis)
+                                long notifyTime = movie.getOpeningTime() - minusTime;
+
+                                if (notifyTime >= epochMillis)
                                 {
-                                    int remainTime = (int) ((movie.getOpeningTime() - minusTime) / 86400000L);
+                                    int remainTime = (int) ((notifyTime - epochMillis) / 86400000L);
 
                                     logger.info("[{}} remainTime", remainTime);
                                     logger.info("[{}] movie.getOpeningTime()", movie.getOpeningTime());
@@ -166,10 +168,11 @@ public class FcmService {
                                 ZonedDateTime koficZonedDateTime = localDate.atStartOfDay(ZoneId.systemDefault());
 
                                 long koficEpochMillis = koficZonedDateTime.toInstant().toEpochMilli();
+                                long notifyTime = koficEpochMillis - minusTime;
 
-                                if (koficEpochMillis - minusTime >= epochMillis)
+                                if (notifyTime >= epochMillis)
                                 {
-                                    int remainTime = (int) ((koficEpochMillis - minusTime) / 86400000L);
+                                    int remainTime = (int) ((notifyTime - epochMillis) / 86400000L);
 
                                     for (String token : user.getDeviceToken())
                                     {
