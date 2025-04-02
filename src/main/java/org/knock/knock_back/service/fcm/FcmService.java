@@ -139,6 +139,8 @@ public class FcmService {
                                     int remainTime = (int) ((movie.getOpeningTime() - minusTime) / 86400000L);
 
                                     logger.info("[{}} remainTime", remainTime);
+                                    logger.info("[{}] movie.getOpeningTime()", movie.getOpeningTime());
+                                    logger.info("[{}] minusTime", minusTime);
                                     for (String token : user.getDeviceToken())
                                     {
                                         sendMessageByToken(token, movie.getMovieNm() + " 개봉 D-" + remainTime +"!", "기다리셨던 그 컨텐츠 지금 확인해보세요!");
