@@ -135,7 +135,7 @@ public class FcmService {
                                         .atStartOfDay(ZoneId.systemDefault())
                                         .toInstant().toEpochMilli();
 
-                                if (movie.getOpeningTime() <= notifyTargetMillis)
+                                if (movie.getOpeningTime() >= todayMillis && movie.getOpeningTime() <= notifyTargetMillis)
                                 {
                                     long remainMillis = movie.getOpeningTime() - todayMillis;
                                     int remainTime = (int) (remainMillis / 86400000L);
@@ -168,7 +168,7 @@ public class FcmService {
                                         .atStartOfDay(ZoneId.systemDefault())
                                         .toInstant().toEpochMilli();
 
-                                if (koficEpochMillis <= notifyTargetMillis)
+                                if (koficEpochMillis >= todayMillis && koficEpochMillis <= notifyTargetMillis)
                                 {
                                     long remainMillis = koficEpochMillis - todayMillis;
                                     int remainTime = (int) (remainMillis / 86400000L);
