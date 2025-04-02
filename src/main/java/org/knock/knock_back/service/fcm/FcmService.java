@@ -60,17 +60,17 @@ public class FcmService {
             writer.write(firebaseJson);
         }
 
-        //Firebase 프로젝트 정보를 FireBaseOptions에 입력해준다.
+        //Firebase 프로젝트 정보를 FireBaseOptions 입력해준다.
         FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(new FileInputStream(tempFile)))
                 .setProjectId(projectId)
                 .build();
 
-        //입력한 정보를 이용하여 initialze 해준다.
+        //입력한 정보를 이용하여 initialize 해준다.
         FirebaseApp.initializeApp(options);
     }
 
-    // 받은 token을 이용하여 fcm를 보내는 메서드
+    // 받은 token 이용하여 fcm 보내는 메서드
     public void sendMessageByToken(String token, String title, String msg) {
 
         try
@@ -99,8 +99,7 @@ public class FcmService {
         Iterable<SSO_USER_INDEX> allUser = ssoUserRepository.findAll();
 
         LocalDate today = LocalDate.now();
-        ZonedDateTime zonedDateTime = today.atStartOfDay(ZoneId.systemDefault());
-        long epochMillis = zonedDateTime.toInstant().toEpochMilli();
+        long todayMillis = today.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
         for (SSO_USER_INDEX user : allUser)
         {
@@ -113,14 +112,12 @@ public class FcmService {
                 if (!usersAlarmTimings[i].equals(AlarmTiming.NONE))
                 {
 
-                    long minusTime = 0;
-
-                    switch (usersAlarmTimings[i])
-                    {
-                        case AlarmTiming.ONE_DAY -> minusTime = 86400000L;
-                        case AlarmTiming.THR_DAY -> minusTime = 86400000L * 2;
-                        case AlarmTiming.SEV_DAY -> minusTime = 86400000L * 7;
-                        case AlarmTiming.TEN_DAY -> minusTime = 86400000L * 10;
+                    long offset = 0;
+                    switch (usersAlarmTimings[i]) {
+                        case AlarmTiming.ONE_DAY -> offset = 1;
+                        case AlarmTiming.THR_DAY -> offset = 2;
+                        case AlarmTiming.SEV_DAY -> offset = 7;
+                        case AlarmTiming.TEN_DAY -> offset = 10;
                     }
 
                     Set<String> idList = new HashSet<>();
@@ -134,21 +131,19 @@ public class FcmService {
                             {
                                 MOVIE_INDEX movie = movieRepository.findById(id).orElseThrow();
 
-                                long notifyTime = movie.getOpeningTime() - minusTime;
+                                long notifyTargetMillis = today.plusDays(offset)
+                                        .atStartOfDay(ZoneId.systemDefault())
+                                        .toInstant().toEpochMilli();
 
-                                if (notifyTime >= epochMillis)
+                                if (movie.getOpeningTime() <= notifyTargetMillis)
                                 {
-                                    int remainTime = (int) ((notifyTime - epochMillis) / 86400000L);
+                                    long remainMillis = movie.getOpeningTime() - todayMillis;
+                                    int remainTime = (int) (remainMillis / 86400000L);
 
-                                    logger.info("[{}} remainTime", remainTime);
-                                    logger.info("[{}] movie.getOpeningTime()", movie.getOpeningTime());
-                                    logger.info("[{}] minusTime", minusTime);
                                     for (String token : user.getDeviceToken())
                                     {
-                                        sendMessageByToken(token, movie.getMovieNm() + " 개봉 D-" + remainTime +"!", "기다리셨던 그 컨텐츠 지금 확인해보세요!");
+                                        sendMessageByToken(token, movie.getMovieNm() + " 개봉 D-" + (remainTime == 0 ? "DAY" : remainTime) +"!", "기다리셨던 그 컨텐츠 지금 확인해보세요!");
                                     }
-
-
                                 }
                             }
                         }
@@ -168,15 +163,19 @@ public class FcmService {
                                 ZonedDateTime koficZonedDateTime = localDate.atStartOfDay(ZoneId.systemDefault());
 
                                 long koficEpochMillis = koficZonedDateTime.toInstant().toEpochMilli();
-                                long notifyTime = koficEpochMillis - minusTime;
 
-                                if (notifyTime >= epochMillis)
+                                long notifyTargetMillis = today.plusDays(offset)
+                                        .atStartOfDay(ZoneId.systemDefault())
+                                        .toInstant().toEpochMilli();
+
+                                if (koficEpochMillis <= notifyTargetMillis)
                                 {
-                                    int remainTime = (int) ((notifyTime - epochMillis) / 86400000L);
+                                    long remainMillis = koficEpochMillis - todayMillis;
+                                    int remainTime = (int) (remainMillis / 86400000L);
 
                                     for (String token : user.getDeviceToken())
                                     {
-                                        sendMessageByToken(token, kofisIndex.getName() + " 개봉 D-" + remainTime +"!", "기다리셨던 그 컨텐츠 지금 확인해보세요!");
+                                        sendMessageByToken(token, kofisIndex.getName() + " 개봉 D-" + (remainTime == 0 ? "DAY" : remainTime) + "!", "기다리셨던 그 컨텐츠 지금 확인해보세요!");
                                     }
                                 }
                             }
