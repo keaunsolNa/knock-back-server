@@ -47,42 +47,26 @@ public class Movie implements MovieInterface {
 
     public void createMovie(Set<MOVIE_DTO> movies) {
 
-        for (SSO_USER_INDEX ssoUserIndex : ssoUserRepository.findAll()) {
+        Set<MOVIE_INDEX> movieIndices = translation.MovieDtoToIndex(movies);
+        movieMaker.recreateMovies(movieIndices);
 
-            Set<String> movieList = ssoUserIndex.getSubscribeList().get(CategoryLevelOne.MOVIE);
+        // Step 3: 사용자 구독 리스트 업데이트
+        Iterable<SSO_USER_INDEX> users = ssoUserRepository.findAll();
+        Set<String> newMovieIds = movieIndices.stream().map(MOVIE_INDEX::getMovieId).collect(Collectors.toSet());
 
-            if (movieList != null) {
-                Set<String> movieIdsToKeep = movies.stream()
-                        .map(MOVIE_DTO::getMovieId)
-                        .collect(Collectors.toSet());
-
-                movieList.removeIf(movieId -> !movieIdsToKeep.contains(movieId));
+        for (SSO_USER_INDEX user : users) {
+            Set<String> userMovieIds = user.getSubscribeList().get(CategoryLevelOne.MOVIE);
+            if (userMovieIds != null) {
+                userMovieIds.retainAll(newMovieIds); // 신규 ID에 없는 건 제거
             }
         }
-        // DELETE ALL DATA BEFORE CREATE
-        movieMaker.deleteMovie();
 
-        movieMaker.CreateMovie(translation.MovieDtoToIndex(movies));
-
+        ssoUserRepository.saveAll(users);
     }
 
     public Iterable<MOVIE_DTO> readMovies() {
 
-        Iterable<MOVIE_DTO> movieDtos = translation.MovieIndexToDTO(movieMaker.readAllMovie());
-
-        List<MOVIE_DTO> list = new ArrayList<>();
-        List<MOVIE_DTO> nullList = new ArrayList<>();
-
-        for (MOVIE_DTO movie : movieDtos) {
-
-            if (movie.getOpeningTime().equals("개봉 예정")) nullList.add(movie);
-            else list.add(movie);
-
-        }
-
-        list.addAll(nullList);
-
-        return list;
+        return translation.MovieIndexToDTO(movieMaker.readAllMovie());
     }
 
     public Optional<MOVIE_INDEX> checkMovie(String movieNm) { return movieMaker.readMovieByNm(movieNm); }

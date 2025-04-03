@@ -3,15 +3,15 @@ package org.knock.knock_back.service.layerInterface;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.knock.knock_back.dto.document.movie.KOFIC_INDEX;
 import org.knock.knock_back.dto.document.movie.MOVIE_INDEX;
 import org.knock.knock_back.repository.movie.MovieRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public interface MovieInterface {
 
@@ -25,25 +25,28 @@ public interface MovieInterface {
             this.elasticsearchOperations = elasticsearchOperations;
         }
 
-        public void CreateMovie(Set<MOVIE_INDEX> movieINDEX) {
-            movieRepository.saveAll(movieINDEX);
+        public void recreateMovies(Set<MOVIE_INDEX> movies) {
+            movieRepository.deleteAll();
+            final int batchSize = 100;
+            List<MOVIE_INDEX> buffer = new ArrayList<>(batchSize);
+
+            for (MOVIE_INDEX movie : movies) {
+                buffer.add(movie);
+                if (buffer.size() >= batchSize) {
+                    movieRepository.saveAll(buffer);
+                    buffer.clear();
+                }
+            }
+
+            if (!buffer.isEmpty()) {
+                movieRepository.saveAll(buffer);
+            }
         }
 
-        public Iterable<MOVIE_INDEX> readAllMovie() {
-
-            NativeQuery query = NativeQuery.builder()
-                    .withQuery(q -> q.matchAll(m -> m
-                    ))
-                    .withSort(Sort.by(Sort.Order.asc("openingTime")))
-                    .withMaxResults(100)
-                    .build();
-
-            SearchHits<MOVIE_INDEX> searchHits = elasticsearchOperations.search(query, MOVIE_INDEX.class);
-
-            return searchHits.getSearchHits()
-                    .stream()
-                    .map(SearchHit::getContent)
-                    .collect(Collectors.toList());
+        public List<MOVIE_INDEX> readAllMovie() {
+            List<MOVIE_INDEX> result = new ArrayList<>();
+            movieRepository.findAll().forEach(result::add);
+            return result;
         }
 
         public Optional<MOVIE_INDEX> readMovieByNm(String nm) { return movieRepository.findByMovieNm(nm); }
@@ -88,24 +91,6 @@ public interface MovieInterface {
                     ;
 
             return elasticsearchOperations.search(query, KOFIC_INDEX.class);
-        }
-
-        public void updateMovie(MOVIE_INDEX movieINDEX) {
-
-            MOVIE_INDEX movieIndex = movieRepository.findById(movieINDEX.getMovieId()).orElseThrow();
-            movieIndex.setFavorites(movieINDEX.getFavorites());
-            movieIndex.setReservationLink(movieINDEX.getReservationLink());
-
-            movieRepository.save(movieIndex);
-
-        }
-
-        public void deleteMovie() {
-            movieRepository.deleteMOVIE_INDEXByOpeningTimeBefore(System.currentTimeMillis());
-        }
-
-        public void deleteById(String id) {
-            movieRepository.deleteById(id);
         }
     }
 }
