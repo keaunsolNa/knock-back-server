@@ -43,9 +43,11 @@ public class KakaoOauth implements SocialOauth {
     @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
     private String KAKAO_USER_INFO_URI;
 
+    private final RestTemplate restTemplate;
     private final SSOUserRepository userRepository;
     private static final Logger logger = LoggerFactory.getLogger(KakaoOauth.class);
     private final JwtTokenProvider jwtTokenProvider;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * controller 에서 요청을 받을 경우 Kakao SSO 요청을 하는 페이지 GET 방식 이동 한다.
@@ -64,8 +66,6 @@ public class KakaoOauth implements SocialOauth {
      */
     @Override
     public String requestAccessToken(String code) {
-
-        RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -113,8 +113,6 @@ public class KakaoOauth implements SocialOauth {
     @Override
     public String[] requestUserInfo(String accessToken) {
 
-        ObjectMapper mapper = new ObjectMapper();
-        RestTemplate restTemplate = new RestTemplate();
         final HttpHeaders headers = new HttpHeaders();
 
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -130,7 +128,7 @@ public class KakaoOauth implements SocialOauth {
 
             if (responseEntity.getStatusCode() == HttpStatus.OK)
             {
-                jsonNode = mapper.readTree(responseEntity.getBody());
+                jsonNode = objectMapper.readTree(responseEntity.getBody());
             }
             else
             {

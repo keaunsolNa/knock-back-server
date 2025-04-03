@@ -46,9 +46,11 @@ public class NaverOauth implements SocialOauth {
     @Value("${spring.security.oauth2.client.provider.naver.user-info-uri}")
     private String NAVER_USER_INFO_URI;
 
+    private final RestTemplate restTemplate;
     private final SSOUserRepository userRepository;
     private static final Logger logger = LoggerFactory.getLogger(NaverOauth.class);
     private final JwtTokenProvider jwtTokenProvider;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * controller 에서 요청을 받을 경우 Naver SSO 요청을 하는 페이지 GET 방식 이동 한다.
@@ -80,8 +82,6 @@ public class NaverOauth implements SocialOauth {
      */
     @Override
     public String requestAccessToken(String code) {
-
-        RestTemplate restTemplate = new RestTemplate();
 
         String apiURL = NAVER_TOKEN_URI +
                 "?grant_type=" + NAVER_GRANT_TYPE +
@@ -132,8 +132,6 @@ public class NaverOauth implements SocialOauth {
     @Override
     public String[] requestUserInfo(String accessToken) {
 
-        RestTemplate restTemplate = new RestTemplate();
-        ObjectMapper mapper = new ObjectMapper();
         HttpHeaders headers = new HttpHeaders();
 
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
@@ -153,7 +151,7 @@ public class NaverOauth implements SocialOauth {
 
             if (responseEntity.getStatusCode() == HttpStatus.OK)
             {
-                jsonNode = mapper.readTree(userInfo).get("response");
+                jsonNode = objectMapper.readTree(userInfo).get("response");
             }
             else
             {

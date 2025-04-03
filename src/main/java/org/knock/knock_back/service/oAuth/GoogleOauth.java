@@ -45,9 +45,11 @@ public class GoogleOauth implements SocialOauth
     @Value("${spring.security.oauth2.client.registration.google.authorization-grant-type}")
     private String GOOGLE_GRANT_TYPE;
 
+    private final RestTemplate restTemplate;
     private final SSOUserRepository userRepository;
     private static final Logger logger = LoggerFactory.getLogger(GoogleOauth.class);
     private final JwtTokenProvider jwtTokenProvider;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * controller 에서 요청을 받을 경우 Google SSO 요청을 하는 페이지 GET 방식 이동 한다.
@@ -76,8 +78,6 @@ public class GoogleOauth implements SocialOauth
      */
     @Override
     public String requestAccessToken(String code) {
-
-        RestTemplate restTemplate = new RestTemplate();
 
         Map<String, Object> params = new HashMap<>();
         params.put("code", code);
@@ -118,8 +118,6 @@ public class GoogleOauth implements SocialOauth
     public String[] requestUserInfo(String accessToken)
     {
 
-        ObjectMapper mapper = new ObjectMapper();
-        RestTemplate restTemplate = new RestTemplate();
         final HttpHeaders headers = new HttpHeaders();
 
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
@@ -134,7 +132,7 @@ public class GoogleOauth implements SocialOauth
 
             if (responseEntity.getStatusCode() == HttpStatus.OK)
             {
-                jsonNode = mapper.readTree(responseEntity.getBody());
+                jsonNode = objectMapper.readTree(responseEntity.getBody());
             }
             else
             {
