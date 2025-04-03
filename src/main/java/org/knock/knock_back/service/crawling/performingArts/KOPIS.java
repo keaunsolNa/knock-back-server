@@ -23,9 +23,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +42,6 @@ public class KOPIS {
     @Value("${api.kopis.key}")
     private String AUTH_KEY;
 
-    private Map<String, CATEGORY_LEVEL_TWO_INDEX> categoryLevelTwoList;
     private final Map<String, Boolean> processedCodes = Collections.synchronizedMap(
             new LinkedHashMap<>(10000, 0.75f, true) {
                 @Override
@@ -53,6 +50,8 @@ public class KOPIS {
                 }
             }
     );
+
+    private Map<String, CATEGORY_LEVEL_TWO_INDEX> categoryLevelTwoList;
 
     private String makeQueryString(Map<String, String> paramMap) {
         StringBuilder sb = new StringBuilder();
@@ -86,11 +85,10 @@ public class KOPIS {
         ));
 
         List<KOPIS_INDEX> buffer = Collections.synchronizedList(new ArrayList<>());
-        final int batchSize = 100;
-        List<Future<?>> futures;
-        try (ExecutorService executor = Executors.newFixedThreadPool(10)) {
-            futures = new ArrayList<>();
+        final int batchSize = 30;
+        List<Future<?>> futures = new ArrayList<>();
 
+        try (ExecutorService executor = Executors.newFixedThreadPool(3)) {
             while (true) {
                 int currentPage = Integer.parseInt(paramMap.get("cpage"));
                 if (currentPage > 100) break;
@@ -112,12 +110,16 @@ public class KOPIS {
                             KOPIS_INDEX performance = new KOPIS_INDEX();
                             performance.setCode(mt20id);
                             fetchPerformanceDetails(performance);
+
                             synchronized (buffer) {
                                 buffer.add(performance);
                                 if (buffer.size() >= batchSize) {
-                                    List<KOPIS_INDEX> tempBatch = new ArrayList<>(buffer);
+                                    try {
+                                        kopisRepository.saveAll(new ArrayList<>(buffer));
+                                    } catch (Exception e) {
+                                        logger.error("Elasticsearch 저장 실패: {}", e.getMessage());
+                                    }
                                     buffer.clear();
-                                    kopisRepository.saveAll(tempBatch);
                                 }
                             }
                         } catch (Exception e) {
@@ -128,20 +130,26 @@ public class KOPIS {
 
                 paramMap.put("cpage", String.valueOf(currentPage + 1));
             }
-
-            executor.shutdown();
-        }
-        try {
-            for (Future<?> future : futures) future.get();
         } catch (Exception e) {
-            logger.error("스레드 작업 대기 중 오류: {}", e.getMessage());
+            logger.error("스레드 실행 실패: {}", e.getMessage());
+        }
+
+        for (Future<?> future : futures) {
+            try {
+                future.get();
+            } catch (Exception e) {
+                logger.error("스레드 작업 대기 중 오류: {}", e.getMessage());
+            }
         }
 
         if (!buffer.isEmpty()) {
-            kopisRepository.saveAll(buffer);
+            try {
+                kopisRepository.saveAll(buffer);
+            } catch (Exception e) {
+                logger.error("최종 저장 실패: {}", e.getMessage());
+            }
         }
     }
-
 
     private List<String> fetchMt20idListFromXml(String url) {
         List<String> mt20ids = new ArrayList<>();
@@ -160,7 +168,9 @@ public class KOPIS {
             while (reader.hasNext()) {
                 int event = reader.next();
                 if (event == XMLStreamConstants.START_ELEMENT && "mt20id".equals(reader.getLocalName())) {
-                    mt20ids.add(reader.getElementText());
+                    if (reader.next() == XMLStreamConstants.CHARACTERS) {
+                        mt20ids.add(reader.getText());
+                    }
                 }
             }
             reader.close();
@@ -187,24 +197,27 @@ public class KOPIS {
             List<String> relates = new ArrayList<>();
             List<String> styurls = new ArrayList<>();
             String currentRelateNm = null;
-            String currentRelateUrl;
 
             while (reader.hasNext()) {
                 int event = reader.next();
                 if (event == XMLStreamConstants.START_ELEMENT) {
                     String tag = reader.getLocalName();
-                    String value = reader.getElementText();
+                    String value;
+                    if (reader.next() == XMLStreamConstants.CHARACTERS) {
+                        value = reader.getText();
+                    } else {
+                        continue;
+                    }
                     switch (tag) {
                         case "relatenm" -> currentRelateNm = value;
                         case "relateurl" -> {
-                            currentRelateUrl = value;
                             if (currentRelateNm != null) {
-                                relates.add(currentRelateNm + " : " + currentRelateUrl);
+                                relates.add(currentRelateNm + " : " + value);
                                 currentRelateNm = null;
                             }
                         }
                         case "styurl" -> {
-                            if (value != null && !value.isBlank()) styurls.add(value);
+                            if (!value.isBlank()) styurls.add(value);
                         }
                         default -> detailMap.put(tag, value);
                     }
@@ -240,7 +253,6 @@ public class KOPIS {
             performance.setRunningTime(parseRuntime(detailMap.getOrDefault("prfruntime", "")));
             performance.setRelates(relates.toArray(new String[0]));
             performance.setStyurls(styurls.toArray(new String[0]));
-
         } catch (Exception e) {
             logger.warn("상세정보 StAX 파싱 실패 ({}): {}", performance.getCode(), e.getMessage());
         }
