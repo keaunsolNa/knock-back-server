@@ -27,14 +27,14 @@ public class JwtAuthenticationHeaderFilter extends OncePerRequestFilter {
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader == null) {
             if (!response.isCommitted()) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Expired token");
+                response.sendError(401);
             }
         }
 
         // "Bearer " 이후의 토큰 값만 추출
         if (!jwtTokenProvider.validateToken(authorizationHeader)) {
             if (!response.isCommitted()) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Expired token");
+                response.sendError(401);
             }
         }
 
