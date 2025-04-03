@@ -30,6 +30,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
 
+        // Logout 관련 처리
+        if (request.getRequestURI().equals("/auth/logout")) return;
+        
         // 헤더에서 Refresh Token 가쟈오기
         String token = jwtTokenProvider.resolveToken(request);
 
