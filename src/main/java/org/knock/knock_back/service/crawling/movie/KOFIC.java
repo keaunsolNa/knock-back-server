@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -39,7 +40,7 @@ public class KOFIC {
     private final KOFICRepository koficRepository;
 
     // Global Field
-    private static boolean flag = false;
+    private static final AtomicBoolean flag = new AtomicBoolean(false);
     private static final Logger logger = LoggerFactory.getLogger(KOFIC.class);
     private final StringDateConvertLongTimeStamp SDCLTS = new StringDateConvertLongTimeStamp();
     private Map<String, CATEGORY_LEVEL_TWO_INDEX> categoryLevelTwoList;
@@ -77,7 +78,7 @@ public class KOFIC {
     @Async
     public void requestAPI() {
 
-        logger.info("Running in thread: {}", Thread.currentThread().getName());
+        if(flag.get()) return;
 
         /*
          * 영화 별 장르는 전역 변수를 통해 관리한다.
@@ -109,6 +110,7 @@ public class KOFIC {
             while (true)
             {
 
+                if(flag.get()) return;
                 // Request URL 연결 객체 생성
                 URL requestURL = URI.create(REQUEST_URL + "?" + makeQueryString(paramMap)).toURL();
 
@@ -131,11 +133,7 @@ public class KOFIC {
                 if (totCnt == 0) break;
 
                 JSONArray dailyBoxOfficeList = boxOfficeResult.getJSONArray("movieList");
-
-                flag = false;
                 parseMovieList(dailyBoxOfficeList);
-
-                if (!flag) break;
 
                 paramMap.put("curPage", String.valueOf(Integer.parseInt(paramMap.get("curPage")) + 1));
             }
@@ -200,13 +198,15 @@ public class KOFIC {
             throw new IOException("HTTP 요청 실패 " + responseCodeKOFIC);
         }
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8));
-        String readline;
-        StringBuilder response = new StringBuilder();
-        while ((readline = br.readLine()) != null) {
-            response.append(readline);
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8)))
+        {
+            String readline;
+            StringBuilder response = new StringBuilder();
+            while ((readline = br.readLine()) != null) {
+                response.append(readline);
+            }
+            return response;
         }
-        return response;
     }
 
     /**
@@ -224,7 +224,7 @@ public class KOFIC {
 
             if (koficRepository.findByKOFICCode(movieJson.optString("movieCd")) == null)
             {
-                flag = true;
+                flag.set(true);
             }
             else continue;
 
