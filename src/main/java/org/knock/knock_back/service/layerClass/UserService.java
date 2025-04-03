@@ -44,7 +44,7 @@ public class UserService {
 
         try
         {
-            SSO_USER_INDEX user = (SSO_USER_INDEX) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            SSO_USER_INDEX user = getCurrentUser();
             return convertDTOAndIndex.userIndexToUserDTO(user);
         }
 
@@ -64,7 +64,7 @@ public class UserService {
         try
         {
 
-            SSO_USER_INDEX user = (SSO_USER_INDEX) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            SSO_USER_INDEX user = getCurrentUser();
             Map<CategoryLevelOne, Set<String>> map = user.getSubscribeList();
 
             Map<String, Iterable<?>> userSubscribeList = new HashMap<>();
@@ -97,7 +97,7 @@ public class UserService {
         try
         {
 
-            SSO_USER_INDEX user = (SSO_USER_INDEX) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            SSO_USER_INDEX user = getCurrentUser();
 
             return user.getSubscribeList().get(categoryLevelOne);
         }
@@ -119,7 +119,7 @@ public class UserService {
         try
         {
 
-            SSO_USER_INDEX user = (SSO_USER_INDEX) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            SSO_USER_INDEX user = getCurrentUser();
 
             return user.getFavoriteLevelOne().name();
         }
@@ -141,7 +141,7 @@ public class UserService {
         try
         {
 
-            SSO_USER_INDEX user = (SSO_USER_INDEX) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            SSO_USER_INDEX user = getCurrentUser();
 
             AlarmTiming[] alarmTimings = user.getAlarmTimings();
             return Arrays.stream(alarmTimings).map(Enum::name).toArray(String[]::new);
@@ -166,7 +166,7 @@ public class UserService {
     {
         try
         {
-            SSO_USER_INDEX user = (SSO_USER_INDEX) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            SSO_USER_INDEX user = getCurrentUser();
 
             user.getSubscribeList().get(categoryLevelOne).add(id);
             ssoUserRepository.save(user);
@@ -191,7 +191,7 @@ public class UserService {
     {
         try
         {
-            SSO_USER_INDEX user = (SSO_USER_INDEX) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            SSO_USER_INDEX user = getCurrentUser();
             user.getSubscribeList().get(categoryLevelOne).remove(id);
             ssoUserRepository.save(user);
 
@@ -215,7 +215,7 @@ public class UserService {
     {
         try
         {
-            SSO_USER_INDEX user = (SSO_USER_INDEX) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            SSO_USER_INDEX user = getCurrentUser();
             return user.getSubscribeList().get(categoryLevelOne).contains(id);
         }
 
@@ -236,7 +236,7 @@ public class UserService {
         try
         {
 
-            SSO_USER_INDEX user = (SSO_USER_INDEX) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            SSO_USER_INDEX user = getCurrentUser();
 
             user.updateFavoriteLevelOne(CategoryLevelOne.valueOf(categoryName.toUpperCase()));
             ssoUserRepository.save(user);
@@ -264,7 +264,7 @@ public class UserService {
         {
 
             logger.info("[{}]", alarmValues);
-            SSO_USER_INDEX user = (SSO_USER_INDEX) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            SSO_USER_INDEX user = getCurrentUser();
 
             int idx = categoryLevelOne.equals(CategoryLevelOne.MOVIE) ? 0
                     : categoryLevelOne.equals(CategoryLevelOne.PERFORMING_ARTS) ? 1 : 2;
@@ -295,7 +295,7 @@ public class UserService {
         try
         {
 
-            SSO_USER_INDEX user = (SSO_USER_INDEX) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            SSO_USER_INDEX user = getCurrentUser();
             user.updateNickName(nickName);
             ssoUserRepository.save(user);
 
@@ -322,7 +322,7 @@ public class UserService {
         try
         {
 
-            SSO_USER_INDEX user = (SSO_USER_INDEX) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            SSO_USER_INDEX user = getCurrentUser();
             Set<String> list = user.getSubscribeList().get(CategoryLevelOne.PERFORMING_ARTS);
             returnValue = new ArrayList<>();
 
@@ -360,7 +360,7 @@ public class UserService {
         try
         {
 
-            SSO_USER_INDEX user = (SSO_USER_INDEX) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            SSO_USER_INDEX user = getCurrentUser();
 
             if (null == user.getDeviceToken() || user.getDeviceToken().isEmpty()) user.setDeviceToken(new ArrayList<>());
 
@@ -494,5 +494,8 @@ public class UserService {
         return null;
     }
 
+    private SSO_USER_INDEX getCurrentUser() {
+        return (SSO_USER_INDEX) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
 
 }
