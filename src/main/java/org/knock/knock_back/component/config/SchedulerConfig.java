@@ -1,7 +1,6 @@
 package org.knock.knock_back.component.config;
 
 import lombok.RequiredArgsConstructor;
-import org.knock.knock_back.repository.performingArts.KOPISRepository;
 import org.knock.knock_back.service.crawling.common.CrawlingService;
 import org.knock.knock_back.service.crawling.performingArts.KOPIS;
 import org.knock.knock_back.service.fcm.FcmService;
@@ -25,7 +24,6 @@ public class SchedulerConfig {
     private final KOFIC kofic;
     private final KOPIS kopis;
     private final CrawlingService crawlingService;
-    private final KOPISRepository kopisRepository;
     private final FcmService fcmService;
 
     @Value("${schedule.kofic.use}")
@@ -99,7 +97,7 @@ public class SchedulerConfig {
         {
             if (useScheduleKOPIS)
             {
-                kopis.requestAPIAsync().thenAccept(kopisRepository::saveAll);
+                kopis.requestAPIAsync();
             }
         }
         catch (Exception e)

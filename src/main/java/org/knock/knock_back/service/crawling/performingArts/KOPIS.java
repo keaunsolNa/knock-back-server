@@ -1,9 +1,6 @@
 package org.knock.knock_back.service.crawling.performingArts;
 
 import lombok.RequiredArgsConstructor;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.XML;
 import org.knock.knock_back.component.util.converter.StringDateConvertLongTimeStamp;
 import org.knock.knock_back.dto.Enum.CategoryLevelOne;
 import org.knock.knock_back.dto.Enum.PrfState;
@@ -18,11 +15,17 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamReader;
+import java.io.StringReader;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +36,7 @@ public class KOPIS {
     private final CategoryLevelTwoRepository categoryLevelTwoRepository;
     private final KOPISRepository kopisRepository;
     private final WebClient webClient = WebClient.create();
+    private static final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 
     @Value("${api.kopis.url}")
     private String REQUEST_URL;
@@ -41,7 +45,14 @@ public class KOPIS {
     private String AUTH_KEY;
 
     private Map<String, CATEGORY_LEVEL_TWO_INDEX> categoryLevelTwoList;
-    private final Set<String> processedCodes = new HashSet<>();
+    private final Map<String, Boolean> processedCodes = Collections.synchronizedMap(
+            new LinkedHashMap<>(10000, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<String, Boolean> eldest) {
+                    return size() > 10000;
+                }
+            }
+    );
 
     private String makeQueryString(Map<String, String> paramMap) {
         StringBuilder sb = new StringBuilder();
@@ -53,7 +64,7 @@ public class KOPIS {
     }
 
     @Async
-    public CompletableFuture<List<KOPIS_INDEX>> requestAPIAsync() {
+    public void requestAPIAsync() {
         logger.info("Running in thread: {}", Thread.currentThread().getName());
 
         categoryLevelTwoList = categoryLevelTwoRepository.findAllByParentNm(CategoryLevelOne.PERFORMING_ARTS)
@@ -74,41 +85,66 @@ public class KOPIS {
                 "cpage", "1"
         ));
 
-        List<KOPIS_INDEX> allPerformances = new ArrayList<>();
+        List<KOPIS_INDEX> buffer = Collections.synchronizedList(new ArrayList<>());
+        final int batchSize = 100;
+        List<Future<?>> futures;
+        try (ExecutorService executor = Executors.newFixedThreadPool(10)) {
+            futures = new ArrayList<>();
 
-        while (true) {
-            int currentPage = Integer.parseInt(paramMap.get("cpage"));
-            if (currentPage > 100) break;
+            while (true) {
+                int currentPage = Integer.parseInt(paramMap.get("cpage"));
+                if (currentPage > 100) break;
 
-            String url = REQUEST_URL + "?" + makeQueryString(paramMap);
-            JSONArray performanceList = fetchJSONArray(url);
+                String url = REQUEST_URL + "?" + makeQueryString(paramMap);
+                List<String> mt20idList = fetchMt20idListFromXml(url);
 
-            if (performanceList == null || performanceList.isEmpty()) {
-                logger.warn("Page {} 응답 실패 또는 결과 없음. 종료.", currentPage);
-                break;
+                if (mt20idList.isEmpty()) {
+                    logger.warn("Page {} 응답 실패 또는 결과 없음. 종료.", currentPage);
+                    break;
+                }
+
+                for (String mt20id : mt20idList) {
+                    if (kopisRepository.existsByCode(mt20id) || processedCodes.containsKey(mt20id)) continue;
+                    processedCodes.put(mt20id, true);
+
+                    futures.add(executor.submit(() -> {
+                        try {
+                            KOPIS_INDEX performance = new KOPIS_INDEX();
+                            performance.setCode(mt20id);
+                            fetchPerformanceDetails(performance);
+                            synchronized (buffer) {
+                                buffer.add(performance);
+                                if (buffer.size() >= batchSize) {
+                                    List<KOPIS_INDEX> tempBatch = new ArrayList<>(buffer);
+                                    buffer.clear();
+                                    kopisRepository.saveAll(tempBatch);
+                                }
+                            }
+                        } catch (Exception e) {
+                            logger.warn("병렬 처리 중 예외 발생 ({}): {}", mt20id, e.getMessage());
+                        }
+                    }));
+                }
+
+                paramMap.put("cpage", String.valueOf(currentPage + 1));
             }
 
-            try {
-                List<KOPIS_INDEX> performances = processPerformanceList(performanceList);
-                allPerformances.addAll(performances);
-            } catch (Exception e) {
-                logger.warn("Page {} 처리 중 예외 발생: {}", currentPage, e.getMessage());
-            }
-
-            paramMap.put("cpage", String.valueOf(currentPage + 1));
+            executor.shutdown();
         }
-
         try {
-            kopisRepository.saveAll(allPerformances);
-            logger.info("총 {}건 저장 완료", allPerformances.size());
+            for (Future<?> future : futures) future.get();
         } catch (Exception e) {
-            logger.error("bonsai 저장 중 오류 발생: {}", e.getMessage());
+            logger.error("스레드 작업 대기 중 오류: {}", e.getMessage());
         }
 
-        return CompletableFuture.completedFuture(allPerformances);
+        if (!buffer.isEmpty()) {
+            kopisRepository.saveAll(buffer);
+        }
     }
 
-    private JSONArray fetchJSONArray(String url) {
+
+    private List<String> fetchMt20idListFromXml(String url) {
+        List<String> mt20ids = new ArrayList<>();
         try {
             String xml = webClient.get()
                     .uri(url)
@@ -117,43 +153,21 @@ public class KOPIS {
                     .timeout(Duration.ofSeconds(10))
                     .block();
 
-            if (xml == null || xml.isBlank()) return null;
+            if (xml == null || xml.isBlank()) return mt20ids;
 
-            JSONObject jsonObject = XML.toJSONObject(xml);
-            return jsonObject.getJSONObject("dbs").optJSONArray("db");
+            XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(new StringReader(xml));
+
+            while (reader.hasNext()) {
+                int event = reader.next();
+                if (event == XMLStreamConstants.START_ELEMENT && "mt20id".equals(reader.getLocalName())) {
+                    mt20ids.add(reader.getElementText());
+                }
+            }
+            reader.close();
         } catch (Exception e) {
-            logger.warn("API 응답 실패: {}", e.getMessage());
-            return null;
+            logger.warn("StAX XML 파싱 실패: {}", e.getMessage());
         }
-    }
-
-    private List<KOPIS_INDEX> processPerformanceList(JSONArray performanceList) {
-        List<KOPIS_INDEX> performanceEntities = new ArrayList<>();
-
-        for (int i = 0; i < performanceList.length(); i++) {
-            JSONObject performanceJson = performanceList.getJSONObject(i);
-            String mt20id = performanceJson.optString("mt20id");
-
-            if (kopisRepository.existsByCode(mt20id) || processedCodes.contains(mt20id)) continue;
-            processedCodes.add(mt20id);
-
-            String genre = performanceJson.optString("genrenm").toUpperCase();
-            CATEGORY_LEVEL_TWO_INDEX category = categoryLevelTwoList.computeIfAbsent(genre, g -> {
-                CATEGORY_LEVEL_TWO_INDEX newCategory = new CATEGORY_LEVEL_TWO_INDEX(g, CategoryLevelOne.PERFORMING_ARTS);
-                categoryLevelTwoRepository.save(newCategory);
-                return newCategory;
-            });
-
-            KOPIS_INDEX performance = new KOPIS_INDEX();
-            performance.setCode(mt20id);
-            performance.setCategoryLevelOne(CategoryLevelOne.PERFORMING_ARTS);
-            performance.setCategoryLevelTwo(category);
-
-            fetchPerformanceDetails(performance);
-            performanceEntities.add(performance);
-        }
-
-        return performanceEntities;
+        return mt20ids;
     }
 
     private void fetchPerformanceDetails(KOPIS_INDEX performance) {
@@ -168,60 +182,72 @@ public class KOPIS {
 
             if (xml == null || xml.isBlank()) return;
 
-            JSONObject detailJson = XML.toJSONObject(xml).getJSONObject("dbs").getJSONObject("db");
+            XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(new StringReader(xml));
+            Map<String, String> detailMap = new HashMap<>();
+            List<String> relates = new ArrayList<>();
+            List<String> styurls = new ArrayList<>();
+            String currentRelateNm = null;
+            String currentRelateUrl;
 
-            performance.setName(detailJson.optString("prfnm"));
-            performance.setFrom(new Date(SDCLTS.Converter(detailJson.optString("prfpdfrom"))));
-            performance.setTo(new Date(SDCLTS.Converter(detailJson.optString("prfpdto"))));
-            performance.setDirectors(detailJson.optString("prfcrew").split(","));
-            performance.setActors(detailJson.optString("prfcast").split(","));
-            performance.setCompanyNm(detailJson.optString("entrpsnmP").split(","));
-            performance.setHoleNm(detailJson.optString("fcltynm"));
-            performance.setPoster(detailJson.optString("poster"));
-            performance.setStory(detailJson.optString("sty"));
-            performance.setArea(detailJson.optString("area"));
-            performance.setPrfState(PrfState.fromKorean(detailJson.optString("prfstate")));
-            performance.setDtguidance(detailJson.optString("dtguidance").split(","));
+            while (reader.hasNext()) {
+                int event = reader.next();
+                if (event == XMLStreamConstants.START_ELEMENT) {
+                    String tag = reader.getLocalName();
+                    String value = reader.getElementText();
+                    switch (tag) {
+                        case "relatenm" -> currentRelateNm = value;
+                        case "relateurl" -> {
+                            currentRelateUrl = value;
+                            if (currentRelateNm != null) {
+                                relates.add(currentRelateNm + " : " + currentRelateUrl);
+                                currentRelateNm = null;
+                            }
+                        }
+                        case "styurl" -> {
+                            if (value != null && !value.isBlank()) styurls.add(value);
+                        }
+                        default -> detailMap.put(tag, value);
+                    }
+                }
+            }
+            reader.close();
 
-            performance.setRelates(extractRelates(detailJson.opt("relates")));
-            performance.setStyurls(extractStyUrls(detailJson.opt("styurls")));
-            performance.setRunningTime(parseRuntime(detailJson.optString("prfruntime")));
+            String genre = detailMap.getOrDefault("genrenm", "기타").toUpperCase();
+            CATEGORY_LEVEL_TWO_INDEX category;
+            synchronized (categoryLevelTwoList) {
+                category = categoryLevelTwoList.get(genre);
+                if (category == null) {
+                    category = new CATEGORY_LEVEL_TWO_INDEX(genre, CategoryLevelOne.PERFORMING_ARTS);
+                    categoryLevelTwoRepository.save(category);
+                    categoryLevelTwoList.put(genre, category);
+                }
+            }
+
+            performance.setCategoryLevelOne(CategoryLevelOne.PERFORMING_ARTS);
+            performance.setCategoryLevelTwo(category);
+            performance.setName(detailMap.get("prfnm"));
+            performance.setFrom(new Date(SDCLTS.Converter(detailMap.get("prfpdfrom"))));
+            performance.setTo(new Date(SDCLTS.Converter(detailMap.get("prfpdto"))));
+            performance.setDirectors(splitComma(detailMap.get("prfcrew")));
+            performance.setActors(splitComma(detailMap.get("prfcast")));
+            performance.setCompanyNm(splitComma(detailMap.get("entrpsnmP")));
+            performance.setHoleNm(detailMap.get("fcltynm"));
+            performance.setPoster(detailMap.get("poster"));
+            performance.setStory(detailMap.get("sty"));
+            performance.setArea(detailMap.get("area"));
+            performance.setPrfState(PrfState.fromKorean(detailMap.get("prfstate")));
+            performance.setDtguidance(splitComma(detailMap.get("dtguidance")));
+            performance.setRunningTime(parseRuntime(detailMap.getOrDefault("prfruntime", "")));
+            performance.setRelates(relates.toArray(new String[0]));
+            performance.setStyurls(styurls.toArray(new String[0]));
 
         } catch (Exception e) {
-            logger.warn("상세정보 조회 실패 ({}): {}", performance.getCode(), e.getMessage());
+            logger.warn("상세정보 StAX 파싱 실패 ({}): {}", performance.getCode(), e.getMessage());
         }
     }
 
-    private String[] extractRelates(Object relatesObj) {
-        List<String> relatesList = new ArrayList<>();
-        if (relatesObj instanceof JSONObject relatesJson) {
-            Object relateData = relatesJson.opt("relate");
-            if (relateData instanceof JSONArray jsonArray) {
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject r = jsonArray.optJSONObject(i);
-                    if (r != null) relatesList.add(r.optString("relatenm") + " : " + r.optString("relateurl"));
-                }
-            } else if (relateData instanceof JSONObject r) {
-                relatesList.add(r.optString("relatenm") + " : " + r.optString("relateurl"));
-            }
-        }
-        return relatesList.toArray(new String[0]);
-    }
-
-    private String[] extractStyUrls(Object styUrlsObject) {
-        List<String> styUrlList = new ArrayList<>();
-        if (styUrlsObject instanceof JSONObject jsonObj) {
-            Object styurlRaw = jsonObj.opt("styurl");
-            if (styurlRaw instanceof JSONArray arr) {
-                for (int i = 0; i < arr.length(); i++) {
-                    String urlStr = arr.optString(i);
-                    if (urlStr != null && !urlStr.isBlank()) styUrlList.add(urlStr);
-                }
-            } else if (styurlRaw instanceof String str) {
-                if (!str.isBlank()) styUrlList.add(str);
-            }
-        }
-        return styUrlList.toArray(new String[0]);
+    private String[] splitComma(String s) {
+        return (s == null || s.isBlank()) ? new String[0] : s.split("\\s*,\\s*");
     }
 
     private long parseRuntime(String runTime) {
