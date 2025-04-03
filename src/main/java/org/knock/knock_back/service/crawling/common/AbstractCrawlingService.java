@@ -40,13 +40,10 @@ public abstract class AbstractCrawlingService implements CrawlingInterface {
         extractor.run();
 
         Elements elements = extractor.getElements();
-        logger.info(elements.toString());
         Set<MOVIE_DTO> dtos = new HashSet<>();
         for (Element element : elements) {
             processElement(element, dtos);
         }
-
-        logger.info(dtos.toString());
         saveData(dtos);
     }
 
