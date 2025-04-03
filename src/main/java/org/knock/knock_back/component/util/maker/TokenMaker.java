@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TokenMaker {
 
-    @Value("${server.reactive.session.cookie.domain}")
+    @Value("${server.reactive.session.cors.domain}")
     private String domain;
 
     /**
