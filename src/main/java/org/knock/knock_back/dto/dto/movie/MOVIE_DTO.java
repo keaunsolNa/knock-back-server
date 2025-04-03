@@ -24,6 +24,6 @@ public class MOVIE_DTO {
     private String plot;
     private Set<String> favorites;
     private Integer favoritesCount;
-    private byte[] img;
+    private String img;
 
 }

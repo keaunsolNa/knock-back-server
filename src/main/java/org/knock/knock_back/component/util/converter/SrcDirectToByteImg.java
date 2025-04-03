@@ -3,10 +3,12 @@ package org.knock.knock_back.component.util.converter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.Base64;
+
 @Component
 public class SrcDirectToByteImg {
 
-    public byte[] srcImgPathToByteImg(String srcImgPath) {
+    public String srcImgPathToByteImg(String srcImgPath) {
 
         if (srcImgPath.startsWith("https:/") && !srcImgPath.startsWith("https://")) {
             srcImgPath = srcImgPath.replaceFirst("https:/", "https://");
@@ -16,10 +18,12 @@ public class SrcDirectToByteImg {
 
         WebClient webClient = WebClient.builder().build();
 
-        return webClient.get()
+        byte[] imgByte = webClient.get()
                 .uri(srcImgPath)
                 .retrieve()
                 .bodyToMono(byte[].class)
                 .block();
+
+        return Base64.getEncoder().encodeToString(imgByte);
     }
 }
