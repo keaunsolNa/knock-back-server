@@ -20,7 +20,6 @@ import org.knock.knock_back.repository.user.SSOUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -51,18 +50,30 @@ public class FcmService {
     {
         if (FirebaseApp.getApps().isEmpty())
         {
-            try (InputStream serviceAccount = new ClassPathResource("firebase/firebase-key.json").getInputStream())
+
+            try
             {
+                String firebaseJson = System.getenv("FCM_CREDENTIALS_JSON");
+
+                File tempFile = File.createTempFile("firebase", ".json");
+                try (FileWriter writer = new FileWriter(tempFile)) {
+                    writer.write(firebaseJson);
+                }
+
+                //Firebase 프로젝트 정보를 FireBaseOptions 입력해준다.
                 FirebaseOptions options = FirebaseOptions.builder()
-                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                        .setCredentials(GoogleCredentials.fromStream(new FileInputStream(tempFile)))
                         .setProjectId(projectId)
                         .build();
+
+                //입력한 정보를 이용하여 initialize 해준다.
                 FirebaseApp.initializeApp(options);
             }
             catch (IOException e)
             {
                 logger.error("Firebase 초기화 실패", e);
             }
+
         }
     }
 
