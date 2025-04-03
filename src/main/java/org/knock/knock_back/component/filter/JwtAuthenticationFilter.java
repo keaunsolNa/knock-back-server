@@ -41,14 +41,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // AccessToken 도 없거나 만료되었다면 login 창으로 redirect
             if (token == null || !jwtTokenProvider.validateToken(token)) {
-                response.sendError(401);
+                if (!response.isCommitted()) {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Expired token");
+                }
             }
 
             // AccessToken 만료되지 않았다면
             else
             {
                 // AccessToken 에서 유저 정보 가져온 뒤 RefreshToken 재 발급
-                SSO_USER_INDEX userIndex;
+                SSO_USER_INDEX userIndex = null;
                 try
                 {
                     userIndex = jwtTokenProvider.getUserDetails(token);
@@ -57,8 +59,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 catch (NullPointerException e)
                 {
                     response.resetBuffer();
-                    response.sendError(401);
-                    return;
+                    if (!response.isCommitted()) {
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Expired token");
+                    }
                 }
 
                 String refreshTokenValue = jwtTokenProvider.generateRefreshToken(userIndex);
@@ -87,6 +90,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         logger.debug("send Error");
-        response.sendError(401);
+        if (!response.isCommitted()) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Expired token");
+        }
     }
 }
