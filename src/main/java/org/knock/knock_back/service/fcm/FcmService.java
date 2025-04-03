@@ -20,12 +20,10 @@ import org.knock.knock_back.repository.user.SSOUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -49,25 +47,23 @@ public class FcmService {
 
     // 의존성 주입이 이루어진 후 초기화를 수행한다.
     @PostConstruct
-    public void initialize() throws IOException {
-
-        String firebaseJson = System.getenv("FCM_CREDENTIALS_JSON");
-        if (firebaseJson == null) {
-            throw new IllegalStateException("Missing FCM_CREDENTIALS_JSON env var");
+    public void initialize()
+    {
+        if (FirebaseApp.getApps().isEmpty())
+        {
+            try (InputStream serviceAccount = new ClassPathResource("firebase/firebase-key.json").getInputStream())
+            {
+                FirebaseOptions options = FirebaseOptions.builder()
+                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                        .setProjectId(projectId)
+                        .build();
+                FirebaseApp.initializeApp(options);
+            }
+            catch (IOException e)
+            {
+                logger.error("Firebase 초기화 실패", e);
+            }
         }
-        File tempFile = File.createTempFile("firebase", ".json");
-        try (FileWriter writer = new FileWriter(tempFile)) {
-            writer.write(firebaseJson);
-        }
-
-        //Firebase 프로젝트 정보를 FireBaseOptions 입력해준다.
-        FirebaseOptions options = FirebaseOptions.builder()
-                .setCredentials(GoogleCredentials.fromStream(new FileInputStream(tempFile)))
-                .setProjectId(projectId)
-                .build();
-
-        //입력한 정보를 이용하여 initialize 해준다.
-        FirebaseApp.initializeApp(options);
     }
 
     // 받은 token 이용하여 fcm 보내는 메서드
