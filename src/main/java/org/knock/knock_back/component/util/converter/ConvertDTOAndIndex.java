@@ -98,7 +98,7 @@ public class ConvertDTOAndIndex {
         {
             SrcDirectToByteImg srcDirectToByteImg = new SrcDirectToByteImg();
             dto.setPosterBase64(index.getPosterBase64());
-//            dto.setImg(srcDirectToByteImg.srcImgPathToByteImg(index.getPosterBase64()));
+            dto.setImg(srcDirectToByteImg.srcImgPathToByteImg(index.getPosterBase64()));
         }
         else
         {
