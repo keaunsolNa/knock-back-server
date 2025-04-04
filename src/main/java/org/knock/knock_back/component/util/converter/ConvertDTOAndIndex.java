@@ -12,9 +12,7 @@ import org.knock.knock_back.dto.document.movie.MOVIE_INDEX;
 import org.knock.knock_back.dto.dto.category.CATEGORY_LEVEL_TWO_DTO;
 import org.knock.knock_back.dto.dto.movie.MOVIE_DTO;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author nks
@@ -68,13 +66,17 @@ public class ConvertDTOAndIndex {
      * @param indexs 변환할 MOVIE_INDEX 객체
      * @return SET<MOVIE_DTO> 반환할 MOVIE_DTO 객체
      */
-    public Set<MOVIE_DTO> MovieIndexToDTO(Iterable<MOVIE_INDEX> indexs) {
+    public List<MOVIE_DTO> MovieIndexToDTO(Iterable<MOVIE_INDEX> indexs) {
 
-        Set<MOVIE_DTO> result = new LinkedHashSet<>();
+        List<MOVIE_DTO> result = new ArrayList<>();
         for (MOVIE_INDEX index : indexs) {
             result.add(MovieIndexToDTO(index));
         }
 
+        // from 기준 오름차순 정렬
+        result.sort(Comparator.comparing(MOVIE_DTO::getOpeningTime));
+
+        System.out.println(result);
         return result;
     }
 
@@ -255,11 +257,17 @@ public class ConvertDTOAndIndex {
      * @return Iterable<KOPIS_DTO>
      */
     public Iterable<KOPIS_DTO> kopisIndexToKopisDTO(Iterable<KOPIS_INDEX> indexes) {
-        Set<KOPIS_DTO> result = new HashSet<>();
+        List<KOPIS_DTO> result = new ArrayList<>();
+
         for (KOPIS_INDEX innerIndex : indexes) {
+            System.out.printf("Inner :  " + innerIndex.getName() + " " + innerIndex.getFrom() + " ~ " + innerIndex.getTo());
             result.add(kopisIndexToKopisDTO(innerIndex));
         }
 
+        // from 기준 오름차순 정렬
+        result.sort(Comparator.comparing(KOPIS_DTO::getFrom));
+
+        System.out.println(result);
         return result;
     }
 
