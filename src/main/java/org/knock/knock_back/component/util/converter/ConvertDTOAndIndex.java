@@ -76,7 +76,6 @@ public class ConvertDTOAndIndex {
         // from 기준 오름차순 정렬
         result.sort(Comparator.comparing(MOVIE_DTO::getOpeningTime));
 
-        System.out.println(result);
         return result;
     }
 
@@ -260,14 +259,12 @@ public class ConvertDTOAndIndex {
         List<KOPIS_DTO> result = new ArrayList<>();
 
         for (KOPIS_INDEX innerIndex : indexes) {
-            System.out.printf("Inner :  " + innerIndex.getName() + " " + innerIndex.getFrom() + " ~ " + innerIndex.getTo());
             result.add(kopisIndexToKopisDTO(innerIndex));
         }
 
         // from 기준 오름차순 정렬
         result.sort(Comparator.comparing(KOPIS_DTO::getFrom));
 
-        System.out.println(result);
         return result;
     }
 
