@@ -94,7 +94,11 @@ public class ConvertDTOAndIndex {
         dto.setKOFICCode(index.getKOFICCode());
         dto.setReservationLink(index.getReservationLink());
 
-        if (index.getPosterBase64().contains("cf.lottecinema."))
+        if (null == index.getPosterBase64())
+        {
+            dto.setPosterBase64(null);
+        }
+        else if (index.getPosterBase64().contains("cf.lottecinema."))
         {
             SrcDirectToByteImg srcDirectToByteImg = new SrcDirectToByteImg();
             dto.setPosterBase64(null);
@@ -193,23 +197,6 @@ public class ConvertDTOAndIndex {
     }
 
     /**
-     * CATEGORY_LEVEL_TWO DTO -> CATEGORY_LEVEL_TWO INDEX
-     *
-     * @param dto 변환할 CATEGORY_LEVEL_TWO 객체
-     * @return CATEGORY_LEVEL_TWO 반환할 CATEGORY_LEVEL_TWO INDEX 객체
-     */
-    public CATEGORY_LEVEL_TWO_INDEX CLTDtoToCLTIndexOne(CATEGORY_LEVEL_TWO_DTO dto) {
-
-        return new CATEGORY_LEVEL_TWO_INDEX
-                (
-                        dto.getId()
-                        , dto.getNm()
-                        , dto.getParentNm()
-                        , dto.getFavoriteUsers()
-                );
-    }
-
-    /**
      * CATEGORY_LEVEL_TWO INDEX -> CATEGORY_LEVEL_TWO DTO
      *
      * @param index 변환할 CATEGORY_LEVEL_TWO 객체
@@ -264,19 +251,6 @@ public class ConvertDTOAndIndex {
     }
 
     /**
-     * Iterable<KOPIS_INDEX> to Iterable<KOPIS_DTO>
-     * @return Iterable<KOPIS_DTO>
-     */
-    public Iterable<KOPIS_INDEX> kopisDtoToKopisIndex(Iterable<KOPIS_DTO> indexes) {
-        Set<KOPIS_INDEX> result = new HashSet<>();
-        for (KOPIS_DTO innerDto : indexes) {
-            result.add(kopisIndexToKopisDTO(innerDto));
-        }
-
-        return result;
-    }
-
-    /**
      * KOPIS INDEX -> KOPIS DTO
      *
      * @param index 변환할 KOPIS 객체
@@ -306,38 +280,6 @@ public class ConvertDTOAndIndex {
         kopisDto.setFavoritesCount(null == index.getFavorites() || index.getFavorites().isEmpty() ? 0 : index.getFavorites().size());
 
         return kopisDto;
-
-    }
-
-    /**
-     * KOPIS DTO -> KOPIS INDEX
-     *
-     * @param dto 변환할 KOPIS 객체
-     * @return KOPIS 반환할 KOPIS INDEX 객체
-     */
-    public KOPIS_INDEX kopisIndexToKopisDTO(KOPIS_DTO dto) {
-        KOPIS_INDEX kopisIndex = new KOPIS_INDEX();
-
-        kopisIndex.setId(dto.getId());
-        kopisIndex.setCode(dto.getCode());
-        kopisIndex.setName(dto.getName());
-        kopisIndex.setFrom(dto.getFrom());
-        kopisIndex.setTo(dto.getTo());
-        kopisIndex.setDirectors(dto.getDirectors());
-        kopisIndex.setActors(dto.getActors());
-        kopisIndex.setCompanyNm(dto.getCompanyNm());
-        kopisIndex.setHoleNm(dto.getHoleNm());
-        kopisIndex.setPoster(dto.getPoster());
-        kopisIndex.setStory(dto.getStory());
-        kopisIndex.setArea(dto.getArea());
-        kopisIndex.setPrfState(dto.getPrfState());
-        kopisIndex.setDtguidance(dto.getDtguidance());
-        kopisIndex.setRelates(dto.getRelates());
-        kopisIndex.setRunningTime(dto.getRunningTime());
-        kopisIndex.setCategoryLevelOne(dto.getCategoryLevelOne());
-        kopisIndex.setCategoryLevelTwo(CLTDtoToCLTIndexOne(dto.getCategoryLevelTwo()));
-
-        return kopisIndex;
 
     }
 }
