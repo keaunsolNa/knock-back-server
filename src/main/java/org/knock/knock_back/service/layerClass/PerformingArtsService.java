@@ -169,7 +169,6 @@ public class PerformingArtsService {
                 .toInstant()
                 .toEpochMilli();
 
-        System.out.println(categoryNm);
         NativeQuery query = NativeQuery.builder()
                 .withQuery(q -> q.bool(b -> b
                         .must(Query.of(f -> f.term(t -> t
