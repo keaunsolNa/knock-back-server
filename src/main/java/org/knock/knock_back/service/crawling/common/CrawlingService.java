@@ -189,6 +189,9 @@ public class CrawlingService extends AbstractCrawlingService {
         if (imgElement.isEmpty()) return;
 
         String srcPath = Objects.requireNonNull(imgElement.first()).attr(currentConfig.getPosterExtract());
+
+        logger.info(currentConfig.getPosterExtract() + " : " + srcPath);
+
         if (srcPath.contains("//") && currentConfig.getName().equals("LOTTE")) {
             srcPath = srcPath.replace("//", "/");
         }
