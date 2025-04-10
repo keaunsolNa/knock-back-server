@@ -19,6 +19,7 @@ import java.util.Map;
 public class OauthService {
 
     private final List<SocialOauth> socialOauthList;
+    private static final ObjectMapper mapper = new ObjectMapper();
     private static final Logger logger = LoggerFactory.getLogger(OauthService.class);
 
     public Map<String, String> request(SocialLoginType socialLoginType)
@@ -36,8 +37,6 @@ public class OauthService {
         SocialOauth socialOauth = this.findSocialOauthByType(socialLoginType);
 
         String callBackResponse = socialOauth.requestAccessToken(code);
-        ObjectMapper mapper = new ObjectMapper();
-
         // JSON 파싱
         JsonNode jsonNode = null;
         try
@@ -46,7 +45,7 @@ public class OauthService {
         }
         catch (JsonProcessingException e)
         {
-            logger.debug(e.getMessage());
+            logger.warn("accessToken 파싱 중 에러 , {}", e.getMessage());
         }
 
         // access_token 추출

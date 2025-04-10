@@ -57,7 +57,7 @@ public interface CrawlingInterface {
         {
             driver = driverThreadLocal.get();
             if (urlPath == null) {
-                logger.error("[{}]", "urlPath is null");
+                logger.warn("urlPath is null");
                 return;
             }
 
@@ -83,7 +83,7 @@ public interface CrawlingInterface {
                 method.invoke(instance, driver, names[1]);
 
             } catch (Exception e) {
-                logger.error("Error in preparePage: {}", e.getMessage(), e);
+                logger.warn("Error in preparePage: {}", e.getMessage());
             }
         }
 

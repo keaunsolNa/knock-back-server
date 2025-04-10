@@ -117,7 +117,7 @@ public class KOPIS {
                                     try {
                                         kopisRepository.saveAll(new ArrayList<>(buffer));
                                     } catch (Exception e) {
-                                        logger.error("Elasticsearch 저장 실패: {}", e.getMessage());
+                                        logger.warn("Elasticsearch 저장 실패: {}", e.getMessage());
                                     }
                                     buffer.clear();
                                 }
@@ -131,14 +131,14 @@ public class KOPIS {
                 paramMap.put("cpage", String.valueOf(currentPage + 1));
             }
         } catch (Exception e) {
-            logger.error("스레드 실행 실패: {}", e.getMessage());
+            logger.warn("스레드 실행 실패: {}", e.getMessage());
         }
 
         for (Future<?> future : futures) {
             try {
                 future.get();
             } catch (Exception e) {
-                logger.error("스레드 작업 대기 중 오류: {}", e.getMessage());
+                logger.warn("스레드 작업 대기 중 오류: {}", e.getMessage());
             }
         }
 
@@ -146,7 +146,7 @@ public class KOPIS {
             try {
                 kopisRepository.saveAll(buffer);
             } catch (Exception e) {
-                logger.error("최종 저장 실패: {}", e.getMessage());
+                logger.warn("최종 저장 실패: {}", e.getMessage());
             }
         }
     }

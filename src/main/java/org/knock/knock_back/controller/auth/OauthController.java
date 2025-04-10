@@ -137,7 +137,7 @@ public class OauthController {
         }
         catch (Exception e)
         {
-            logger.error(e.getMessage());
+            logger.warn("AccessToken 생성 중 에러 발생 {}", e.getMessage());
             return ResponseEntity.badRequest().build();
         }
 
@@ -177,7 +177,7 @@ public class OauthController {
         }
         catch (Exception e)
         {
-            logger.error(e.getMessage());
+            logger.warn("토큰 제거 중 에러 발생 {}", e.getMessage());
             return ResponseEntity.badRequest().build();
         }
 

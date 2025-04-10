@@ -96,13 +96,13 @@ public class GoogleOauth implements SocialOauth
             }
             else
             {
-                logger.error("Failed to retrieve Google token: {}", responseEntity.getStatusCode());
+                logger.warn("Failed to retrieve Google token: {}", responseEntity.getStatusCode());
                 throw new RuntimeException("Failed to retrieve Google token");
             }
         }
         catch (Exception e)
         {
-            logger.error("Exception during Google token retrieval: ", e);
+            logger.warn("Exception during Google token retrieval: ", e);
             throw new RuntimeException("Exception during Google token retrieval", e);
         }
 
@@ -136,14 +136,14 @@ public class GoogleOauth implements SocialOauth
             }
             else
             {
-                logger.error("Failed to retrieve Google user info: {}", responseEntity.getStatusCode());
+                logger.warn("Failed to retrieve Google user info: {}", responseEntity.getStatusCode());
                 throw new RuntimeException("Failed to retrieve Google user info");
             }
 
         }
         catch (Exception e)
         {
-            logger.error("Exception during Google user info retrieval: ", e);
+            logger.warn("Exception during Google user info retrieval: ", e);
             throw new RuntimeException("Exception during Google user info retrieval", e);
         }
 

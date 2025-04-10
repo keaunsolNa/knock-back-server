@@ -148,6 +148,7 @@ public class JwtTokenProvider {
 
         try
         {
+            if (null == token || token.isEmpty()) return null;
             Claims claims = Jwts.parser()
                     .verifyWith(KEY)
                     .build()
@@ -158,7 +159,7 @@ public class JwtTokenProvider {
         }
         catch (Exception e)
         {
-            logger.error("[{}]", e.getMessage());
+            logger.warn("유저 정보 추출 중 에러, {}", e.getMessage());
             return null;
         }
 
@@ -181,7 +182,7 @@ public class JwtTokenProvider {
     /**
      * refreshToken 통해 USER_SSO_INDEX 정보를 가져온다.
      * @param token : 대상 refreshToken
-     * @retrun 유저 정보
+     * @return 유저 정보
      */
     public SSO_USER_INDEX getUserDetails(String token) {
         return ssoUserRepository.findById(this.getUserPk(token)).orElseThrow();
@@ -194,6 +195,7 @@ public class JwtTokenProvider {
     public boolean validateToken(String jwtToken) {
         try {
 
+            if (null == jwtToken || jwtToken.isEmpty()) return false;
 
             Jwts.parser()
                 .verifyWith(KEY)
@@ -206,25 +208,22 @@ public class JwtTokenProvider {
 
         catch (ExpiredJwtException exception)
         {
-            logger.debug("token expired " + jwtToken);
-            logger.error("Token Expired " + exception);
+            logger.warn("ExpiredJwtException, {}", exception.getMessage());
             return false;
         }
         catch (JwtException exception)
         {
-            logger.debug("token expired " + jwtToken);
-            logger.error("Token Tampered " + exception);
+            logger.warn("JwtException, {}", exception.getMessage());
             return false;
         }
         catch (NullPointerException exception)
         {
-            logger.debug("token expired " + jwtToken);
-            logger.error("Token is null " + exception);
+            logger.warn("NullPointerException, {}", exception.getMessage());
             return false;
         }
         catch (IllegalArgumentException exception)
         {
-            logger.debug("token Can not be null " + jwtToken);
+            logger.warn("IllegalArgumentException, {}", exception.getMessage());
             return false;
         }
     }

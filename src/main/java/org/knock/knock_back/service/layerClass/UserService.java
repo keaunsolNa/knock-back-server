@@ -50,7 +50,7 @@ public class UserService {
 
         catch (Exception e)
         {
-            logger.debug(e.getMessage());
+            logger.warn("토큰에서 유저 정보 가져오기 중 에러 발생, {}", e.getMessage());
             return null;
         }
     }
@@ -81,7 +81,7 @@ public class UserService {
 
         catch (Exception e)
         {
-            logger.debug(e.getMessage());
+            logger.warn("전체 구독 목록 가져오기 중 에러 발생, {}", e.getMessage());
             return null;
         }
 
@@ -104,7 +104,7 @@ public class UserService {
 
         catch (Exception e)
         {
-            logger.debug(e.getMessage());
+            logger.warn("구독 목록 가져오기 중 에러 발생, {}", e.getMessage());
             return null;
         }
 
@@ -126,7 +126,7 @@ public class UserService {
 
         catch (Exception e)
         {
-            logger.debug(e.getMessage());
+            logger.warn("구독 대상 가져오기 중 에러 발생, {}", e.getMessage());
             return null;
         }
 
@@ -150,7 +150,7 @@ public class UserService {
 
         catch (Exception e)
         {
-            logger.debug(e.getMessage());
+            logger.warn("카테고리 별 구독 가져오기 중 에러 발생, {}", e.getMessage());
             return null;
         }
 
@@ -176,7 +176,7 @@ public class UserService {
 
         catch (Exception e)
         {
-            logger.debug(e.getMessage());
+            logger.warn("구독 중 에러 발생, {}", e.getMessage());
             return -1;
         }
     }
@@ -200,7 +200,7 @@ public class UserService {
 
         catch (Exception e)
         {
-            logger.debug(e.getMessage());
+            logger.warn("구독 취소 중 에러 발생, {}", e.getMessage());
             return -1;
         }
     }
@@ -221,7 +221,7 @@ public class UserService {
 
         catch (Exception e)
         {
-            logger.debug(e.getMessage());
+            logger.warn("구독 확인 중 에러 발생, {}", e.getMessage());
             return false;
         }
     }
@@ -246,7 +246,7 @@ public class UserService {
 
         catch (Exception e)
         {
-            logger.debug(e.getMessage());
+            logger.warn("선호 카테고리 변경 중 에러 발생, {}", e.getMessage());
             return false;
         }
     }
@@ -280,7 +280,7 @@ public class UserService {
 
         catch (Exception e)
         {
-            logger.debug(e.getMessage());
+            logger.warn("알람 정보 변경 중 에러 발생, {}", e.getMessage());
             return false;
         }
     }
@@ -304,7 +304,7 @@ public class UserService {
 
         catch (Exception e)
         {
-            logger.debug(e.getMessage());
+            logger.warn("닉네임 변경 중 에러 발생, {}", e.getMessage());
             return false;
         }
     }
@@ -342,7 +342,7 @@ public class UserService {
 
         catch (Exception e)
         {
-            logger.debug(e.getMessage());
+            logger.warn("장르별 구독 id 가져오기 중 에러 발생, {}", e.getMessage());
             return new String[0];
         }
 
@@ -374,7 +374,7 @@ public class UserService {
 
         catch (Exception e)
         {
-            logger.debug(e.getMessage());
+            logger.warn("디바이스 토큰 저장 중 에러 발생, {}", e.getMessage());
             return false;
         }
 
@@ -428,8 +428,6 @@ public class UserService {
                 return performingIndex.getFavorites().size();
             }
 
-            // TODO EXHIBITION
-
         }
 
         return -1;
@@ -449,25 +447,20 @@ public class UserService {
             case CategoryLevelOne.MOVIE ->
             {
 
-                Set<MOVIE_DTO> set = new HashSet<>();
-                for (String id : list)
+                Set<MOVIE_DTO> set = Set.of();
+                try
                 {
-                    MOVIE_INDEX movieIndex;
-                    try
-                    {
-                        movieIndex = movieRepository.findById(id).orElseThrow();
-                        set.add(convertDTOAndIndex.MovieIndexToDTO(movieIndex));
-                    } catch (Exception e)
-                    {
-                        logger.info(e.getMessage());
-                    }
-
+                    Iterable<MOVIE_INDEX> movies = movieRepository.findAllById(list);
+                    set = new HashSet<>(convertDTOAndIndex.MovieIndexToDTO(movies));
+                } catch (Exception e)
+                {
+                    logger.warn("카테고리 id 목록으로 영화 인덱스 객체 가져오기 중 에러 발생, {}", e.getMessage());
                 }
+
 
                 return set;
             }
 
-            // TODO 다른 것들
             case CategoryLevelOne.PERFORMING_ARTS ->
             {
 
@@ -482,7 +475,7 @@ public class UserService {
 
                     } catch (Exception e)
                     {
-                        logger.info(e.getMessage());
+                        logger.warn("카테고리 id 목록으로 영화 인덱스 객체 가져오기 중 에러 발생, {}", e.getMessage());
                     }
 
                 }
