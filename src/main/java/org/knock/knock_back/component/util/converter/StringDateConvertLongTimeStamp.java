@@ -30,7 +30,7 @@ public class StringDateConvertLongTimeStamp {
 
         if (dateString == null || dateString.isEmpty())
         {
-            logger.error("[{}]", "parameter is null");
+            logger.warn("[{}]", "parameter is null");
             return 0L;
         }
 
@@ -53,7 +53,7 @@ public class StringDateConvertLongTimeStamp {
             case 10 : dateFormat = new SimpleDateFormat("yyyy.MM.dd"); break;
 
             default:
-                logger.error("[{}]", "parameter is Illegal : " + dateString + "\t " + dateString.length());
+                logger.warn("parameter is Illegal  {}", dateString + "\t " + dateString.length());
 
                 return 0L;
         }
@@ -68,7 +68,7 @@ public class StringDateConvertLongTimeStamp {
         }
         catch (ParseException e)
         {
-            logger.error("[{}]", e.getMessage());
+            logger.warn(" 파싱 중 에러 발생 {}", e.getMessage());
         }
 
         return result;
@@ -84,7 +84,7 @@ public class StringDateConvertLongTimeStamp {
 
         if (time == 0)
         {
-            logger.error("[{}]", "parameter is null");
+            logger.warn("parameter is null");
             return "개봉 예정";
         }
 

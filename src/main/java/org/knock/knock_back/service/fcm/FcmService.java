@@ -71,7 +71,7 @@ public class FcmService {
             }
             catch (IOException e)
             {
-                logger.error("Firebase 초기화 실패", e);
+                logger.warn("Firebase 초기화 실패 {}", e.getMessage());
             }
 
         }
@@ -92,7 +92,7 @@ public class FcmService {
         }
         catch (FirebaseMessagingException e)
         {
-            logger.debug(e.getMessage());
+            logger.warn("메세지 발송 중 에러 발생 {}", e.getMessage());
         }
 
     }

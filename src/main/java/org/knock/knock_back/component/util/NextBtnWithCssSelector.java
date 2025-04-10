@@ -47,7 +47,7 @@ public class NextBtnWithCssSelector {
         }
         catch (Exception e)
         {
-            logger.debug("오류 발생: {}", e.getMessage());
+            logger.warn("다음 페이지 버튼 작동 중 에러 발생, {}", e.getMessage());
         }
     }
 
@@ -91,7 +91,7 @@ public class NextBtnWithCssSelector {
             }
 
         } catch (Exception e) {
-            logger.debug("스크롤링 중 오류 발생: {}", e.getMessage(), e);
+            logger.warn("스크롤링 작동 중 에러 발생, {}", e.getMessage());
         }
     }
 }

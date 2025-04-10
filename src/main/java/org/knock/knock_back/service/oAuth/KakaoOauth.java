@@ -92,13 +92,13 @@ public class KakaoOauth implements SocialOauth {
             }
             else
             {
-                logger.error("Failed to retrieve Kakao token: {}", responseEntity.getStatusCode());
+                logger.warn("Failed to retrieve Kakao token: {}", responseEntity.getStatusCode());
                 throw new RuntimeException("Failed to retrieve Kakao token");
             }
         }
         catch (Exception e)
         {
-            logger.error("Exception during Kakao token retrieval: ", e);
+            logger.warn("Exception during Kakao token retrieval: ", e);
             throw new RuntimeException("Exception during Kakao token retrieval", e);
         }
 
@@ -132,14 +132,14 @@ public class KakaoOauth implements SocialOauth {
             }
             else
             {
-                logger.error("Failed to retrieve Kakao user info: {}", responseEntity.getStatusCode());
+                logger.warn("Failed to retrieve Kakao user info: {}", responseEntity.getStatusCode());
                 throw new RuntimeException("Failed to retrieve Kakao user info");
             }
 
         }
         catch (Exception e)
         {
-            logger.error("Exception during Kakao user info retrieval: ", e);
+            logger.warn("Exception during Kakao user info retrieval: ", e);
             throw new RuntimeException("Exception during Kakao user info retrieval", e);
         }
 

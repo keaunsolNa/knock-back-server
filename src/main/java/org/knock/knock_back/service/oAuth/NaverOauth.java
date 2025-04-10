@@ -109,14 +109,14 @@ public class NaverOauth implements SocialOauth {
             }
             else
             {
-                logger.error("Failed to retrieve access token: {}", responseEntity.getBody());
+                logger.warn("Failed to retrieve access token: {}", responseEntity.getBody());
                 throw new RuntimeException("Failed to retrieve naver token");
             }
 
         }
         catch (Exception e)
         {
-            logger.error("Error during access token request: {}", e.getMessage());
+            logger.warn("Error during access token request: {}", e.getMessage());
             throw new RuntimeException("Exception during Kakao token retrieval", e);
         }
 
@@ -155,14 +155,14 @@ public class NaverOauth implements SocialOauth {
             }
             else
             {
-                logger.error("Failed to retrieve Naver user info: {}", responseEntity.getStatusCode());
+                logger.warn("Failed to retrieve Naver user info: {}", responseEntity.getStatusCode());
                 throw new RuntimeException("Failed to retrieve Naver user info");
             }
 
         }
         catch (Exception e)
         {
-            logger.error("Exception during Naver user info retrieval: ", e);
+            logger.warn("Exception during Naver user info retrieval: ", e);
             throw new RuntimeException("Exception during Naver user info retrieval", e);
         }
 

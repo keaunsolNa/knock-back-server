@@ -92,7 +92,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        logger.debug("send Error");
         if (!response.isCommitted()) {
             response.sendError(401);
         }

@@ -60,7 +60,7 @@ public class SchedulerConfig {
         }
         catch (Exception e)
         {
-            logger.debug("[{}] KOFIC 크롤링 중 에러 : ", e.getMessage());
+            logger.warn("FCM JOB 에러, {}", e.getMessage());
         }
     }
 
@@ -81,7 +81,7 @@ public class SchedulerConfig {
         }
         catch (Exception e)
         {
-            logger.debug("[{}] KOFIC 크롤링 중 에러 : ", e.getMessage());
+            logger.warn("KOFIC 크롤링 중 에러, {}", e.getMessage());
         }
     }
 
@@ -102,7 +102,7 @@ public class SchedulerConfig {
         }
         catch (Exception e)
         {
-            logger.debug("[{}] KOPIS 크롤링 중 에러 : ", e.getMessage());
+            logger.warn("KOPIS 크롤링 중 에러, {}", e.getMessage());
         }
     }
 
@@ -124,7 +124,7 @@ public class SchedulerConfig {
         }
         catch (Exception e)
         {
-            logger.debug("[{}] MegaBox 크롤링 중 에러 : ", e.getMessage());
+            logger.warn("MegaBox 크롤링 중 에러, {}", e.getMessage());
         }
     }
 
@@ -145,7 +145,7 @@ public class SchedulerConfig {
         }
         catch (Exception e)
         {
-            logger.debug("[{}] CGV 크롤링 중 에러 : ", e.getMessage());
+            logger.warn("CGV 크롤링 중 에러, {}", e.getMessage());
         }
     }
 
@@ -166,7 +166,7 @@ public class SchedulerConfig {
         }
         catch (Exception e)
         {
-            logger.debug("[{}] Lotte 크롤링 중 에러 : ", e.getMessage());
+            logger.warn("Lotte 크롤링 중 에러, {}", e.getMessage());
         }
     }
 }
