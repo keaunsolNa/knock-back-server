@@ -1,10 +1,8 @@
 FROM openjdk:23-jdk-slim
 
-# 필수 패키지 설치 및 업데이트
-RUN apt-get update && apt-get install -y apt-utils
-
-# 필요한 의존성 패키지 설치 (Google Chrome 설치 전에)
+# 필수 패키지 설치
 RUN apt-get update && apt-get install -y \
+    apt-utils \
     wget \
     curl \
     unzip \
@@ -21,7 +19,6 @@ RUN apt-get update && apt-get install -y \
     libatk1.0-0 \
     libcups2 \
     libnspr4 \
-    libnss3 \
     libxss1 \
     libappindicator3-1 \
     fonts-liberation \
@@ -29,22 +26,30 @@ RUN apt-get update && apt-get install -y \
     libgbm1 \
     libvulkan1 \
     --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN wget -q https://chromedriver.storage.googleapis.com/113.0.5672.0/chromedriver_linux64.zip
-RUN apt-get install -y ./google-chrome-stable_current_amd64.deb
-RUN rm ./google-chrome-stable_current_amd64.deb
+# Chrome 설치
+RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+    && apt install -y ./google-chrome-stable_current_amd64.deb \
+    && rm ./google-chrome-stable_current_amd64.deb
 
-RUN google-chrome --version
+# ChromeDriver 설치
+RUN wget -q https://chromedriver.storage.googleapis.com/113.0.5672.0/chromedriver_linux64.zip \
+    && unzip chromedriver_linux64.zip \
+    && mv chromedriver /usr/local/bin/ \
+    && chmod +x /usr/local/bin/chromedriver \
+    && rm chromedriver_linux64.zip
 
-# 애플리케이션 디렉토리 생성
+RUN google-chrome --version && chromedriver --version
+
+# 앱 디렉토리 설정
 WORKDIR /app
 
-# 빌드한 JAR 파일을 컨테이너로 복사
+# JAR 파일 복사
 COPY build/libs/knock_back-0.0.1-SNAPSHOT.jar ./knock_back.jar
 
-# 애플리케이션 포트 설정 (기본 8080)
+# 포트 개방
 EXPOSE 53287
 
-# JAR 파일 실행
+# 애플리케이션 실행
 CMD ["java", "-jar", "knock_back.jar"]
