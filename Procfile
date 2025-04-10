@@ -1,1 +1,1 @@
-web: java -Xss512k -Xmx300m -XX:+UseSerialGC -XX:+UseCompressedOops -XX:+PrintGCDetails -XX:+UseContainerSupport -jar build/libs/knock_back-0.0.1-SNAPSHOT.jar
+web: java -Xss512k -Xmx300m -XX:+UseG1GC -XX:+UseCompressedOops -XX:NewRatio=2 -XX:SurvivorRatio=8 -Xlog:gc*:file=gc.log:time,level,tags:filecount=5,filesize=1m -XX:+UseContainerSupport -jar build/libs/knock_back-0.0.1-SNAPSHOT.jar
