@@ -1,7 +1,6 @@
 package org.knock.knock_back.component.util.maker;
 
 import org.jetbrains.annotations.NotNull;
-import org.knock.knock_back.service.crawling.performingArts.KOPIS;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
@@ -19,10 +18,13 @@ import java.util.UUID;
 /**
  * @author nks
  * @apiNote WebDriver 설정을 제어하고 생성된 객체를 반환한다.
+ * Heroku 배포 환경의 경우, 메모리 제한으로 인해 크롤링을 실행하지 않는다.
+ * 크롤링은 로컬 환경에서 생성하며, 추후 파이썬으로 별도 서버 올릴 예정
+ * 그렇기에 해당 컴포넌트는 Bean 등록하지 않는다.
  */
 public class WebDriverUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(KOPIS.class);
+    private static final Logger logger = LoggerFactory.getLogger(WebDriverUtil.class);
     /**
      * ChromeDriver 옵션 지정 및 생성
      * @return 생성된 WebDriver 객체
@@ -32,7 +34,7 @@ public class WebDriverUtil {
         Path tempDirPath = Paths.get(uniqueTempDir);
         try {
             Files.createDirectories(tempDirPath);
-            logger.info("✅ Created user-data-dir: {}", uniqueTempDir);  // 디렉토리 생성 로그
+            logger.info("Created user-data-dir: {}", uniqueTempDir);  // 디렉토리 생성 로그
         } catch (Exception e) {
             logger.warn("Failed to create temp directory for Chrome user data: {}", e.getMessage());
         }
@@ -41,15 +43,15 @@ public class WebDriverUtil {
         try {
             ProcessBuilder processBuilder = new ProcessBuilder("pkill", "-f", "chrome");
             processBuilder.start();
-            logger.info("✅ Attempted to kill existing Chrome processes.");
+            logger.info("Attempted to kill existing Chrome processes.");
         } catch (Exception e) {
             logger.warn("Failed to kill existing Chrome processes: {}", e.getMessage());
         }
 
         ChromeOptions options = getChromeOptions(uniqueTempDir);
-        logger.info("✅ Chrome option set: --user-data-dir={}", uniqueTempDir);
+        logger.info("Chrome option set: --user-data-dir={}", uniqueTempDir);
 
-        // 🔹 Heroku ChromeDriver 실행 경로 설정
+        // Heroku ChromeDriver 실행 경로 설정
         File driverExecutable = new File("/app/.chrome-for-testing/chromedriver-linux64/chromedriver");
         if (!driverExecutable.exists()) {
             logger.warn("❌ ChromeDriver not found at: {}", driverExecutable.getAbsolutePath());
@@ -71,7 +73,7 @@ public class WebDriverUtil {
         WebDriver driver = new ChromeDriver(service, options);
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(100));
 
-        logger.info("✅ ChromeDriver started successfully!");
+        logger.info("ChromeDriver started successfully!");
 
         return driver;
 
@@ -89,10 +91,10 @@ public class WebDriverUtil {
         options.addArguments("--blink-settings=imagesEnabled=false");
         options.addArguments("--disable-notifications");
 
-        // 🔹 CDP 버전 경고 무시 옵션 추가
+        // CDP 버전 경고 무시 옵션 추가
         options.addArguments("--disable-build-check");
 
-        // 🔹 고유한 user-data-dir 설정
+        // 고유한 user-data-dir 설정
         options.addArguments("--user-data-dir=" + uniqueTempDir);
         return options;
     }

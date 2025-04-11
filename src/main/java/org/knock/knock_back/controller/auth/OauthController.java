@@ -28,7 +28,6 @@ import org.knock.knock_back.service.layerClass.OauthService;
  * @apiNote SSO Login 시 인입되는 페이지
  */
 @RestController
-@CrossOrigin
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 public class OauthController {
@@ -57,7 +56,6 @@ public class OauthController {
      * @param httpServletResponse : 반환 될 response 객체
      * @return token : response 객체에 refresh 토큰 담아 반환
      */
-    @CrossOrigin
     @PostMapping(value = "/login/{socialLoginType}/callback")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> callback(@PathVariable(name = "socialLoginType") SocialLoginType socialLoginType,
@@ -105,7 +103,6 @@ public class OauthController {
      */
     @PostMapping(value = "/getAccessToken")
     @ResponseBody
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<Map<String, String>> getAccessToken( HttpServletRequest request ) {
 
         String token = jwtTokenProvider.resolveToken(request);
@@ -148,7 +145,6 @@ public class OauthController {
      */
     @PostMapping(value = "/logout")
     @ResponseBody
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<Map<String, String>> logout( HttpServletRequest request, HttpServletResponse response ) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

@@ -45,9 +45,8 @@ public class JwtTokenProvider {
     public String generateAccessToken(SSO_USER_INDEX user) {
 
         long now = System.currentTimeMillis();
-
-
         long ACCESS_EXPIRATION = 31 * 24 * 60 * 10000;
+
         return Jwts.builder()
                 .header().add("typ", "JWT").add("alg", "HmacSHA256").and()
                 .issuer(issuer)
@@ -69,8 +68,8 @@ public class JwtTokenProvider {
     public String generateRefreshToken(SSO_USER_INDEX user) {
 
         long now = System.currentTimeMillis();
-
         long REFRESH_EXPIRATION = 7 * 24 * 60 * 10000;
+
         return Jwts.builder()
                 .header().add("typ", "JWT").add("alg", "HmacSHA256").and()
                 .issuer(issuer)
@@ -129,7 +128,6 @@ public class JwtTokenProvider {
             for (Cookie cookie : request.getCookies()) {
 
                 if (cookie.getName().equals("accessToken")) {
-                    logger.info("[{}]", cookie.getName() + ": " + cookie.getValue());
                     return cookie.getValue();
                 }
             }
@@ -162,10 +160,6 @@ public class JwtTokenProvider {
             logger.warn("유저 정보 추출 중 에러, {}", e.getMessage());
             return null;
         }
-
-
-
-
     }
 
     /**

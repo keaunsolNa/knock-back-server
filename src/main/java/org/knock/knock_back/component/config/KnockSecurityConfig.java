@@ -62,7 +62,6 @@ public class KnockSecurityConfig {
                         exceptionHandling.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 );
 
-
         return http.build();
     }
 

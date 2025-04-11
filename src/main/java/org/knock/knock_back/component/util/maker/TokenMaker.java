@@ -39,9 +39,8 @@ public class TokenMaker {
     {
         accessTokenForKnock.setPath("/");
         accessTokenForKnock.setHttpOnly(true);
-        accessTokenForKnock.setSecure(false);
+        accessTokenForKnock.setSecure(true);
         accessTokenForKnock.setDomain(domain);
-//        accessTokenForKnock.setDomain("localhost");
         accessTokenForKnock.setAttribute("SameSite", "None");
     }
 
@@ -51,7 +50,6 @@ public class TokenMaker {
         refreshTokenForKnock.setHttpOnly(true);
         refreshTokenForKnock.setSecure(true);
         refreshTokenForKnock.setDomain(domain);
-//        refreshTokenForKnock.setDomain("localhost");
         refreshTokenForKnock.setAttribute("SameSite", "None");
         refreshTokenForKnock.setMaxAge(0);
     }

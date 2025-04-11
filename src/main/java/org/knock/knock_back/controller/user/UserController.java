@@ -13,9 +13,9 @@ import java.util.*;
 /**
  * @author nks
  * @apiNote user 정보 변경에 활용되는 페이지
+ * 해당 컨트롤러의 모든 인입은 JWT 토큰 유효 검증 절차 수행
  */
 @RestController
-@CrossOrigin
 @RequiredArgsConstructor
 @RequestMapping("/user")
 public class UserController {
@@ -83,7 +83,6 @@ public class UserController {
      */
     @PostMapping("/{category}/sub")
     @ResponseBody
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<Integer> subscribe(@PathVariable(name = "category") CategoryLevelOne categoryLevelOne,
                                              @RequestBody Map<String, String> valueMap)
     {

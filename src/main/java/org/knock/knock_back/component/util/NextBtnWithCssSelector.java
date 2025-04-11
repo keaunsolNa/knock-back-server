@@ -56,7 +56,6 @@ public class NextBtnWithCssSelector {
      * @param driver 제어할 WebDriver 객체
      * @param cssSelector 작동할 버튼의 cssSelector
      */
-
     public static void scrollDownUntilElementLoaded(WebDriver driver, String cssSelector) {
         try {
 

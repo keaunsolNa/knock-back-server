@@ -29,6 +29,11 @@ public class PerformingArtsController  {
         return ResponseEntity.ok(performingArtsService.readPerformingArts());
     }
 
+    /**
+     * 카테고리 별 공연예술 정보를 반환한다.
+     * @param category : 카테고리 정보. PerformingArtsGenre.Enum
+     * @return ResponseEntity<Iterable<KOPIS_DTO>> : 대상 공연예술 정보
+     */
     @GetMapping("/category")
     public ResponseEntity<Iterable<KOPIS_DTO>> getPerformingArts(@RequestParam(name = "category") String category) {
 
@@ -55,7 +60,7 @@ public class PerformingArtsController  {
     /**
      * 요청 시 현재 공연예술을 구독한 다른 사람들이 공통으로 구독하고 있는 공연예술을 리스트로 만들어 반환한다.
      * @param performingArtsId : 확인하고 싶은 공연예술의 id
-     * @retrun ResponseEntity<Iterable<KOPIS_INDEX>> : 대상 공연예술을 구독한 사람들이 공통적으로 구독한 공연예술들
+     * @return ResponseEntity<Iterable<KOPIS_INDEX>> : 대상 공연예술을 구독한 사람들이 공통적으로 구독한 공연예술들
      */
     @GetMapping("/recommend")
     public ResponseEntity<Iterable<KOPIS_DTO>> getRecommend(@RequestParam String performingArtsId) {

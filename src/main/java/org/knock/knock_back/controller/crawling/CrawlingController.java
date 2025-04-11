@@ -30,7 +30,7 @@ public class CrawlingController {
     }
 
     /**
-     * 상영 예정작품들을 가져와 Index 저장
+     * 크롤링 통합 컨트롤러
      */
     @GetMapping("/{source}")
     public ResponseEntity<String> crawl(@PathVariable String source) {
@@ -56,13 +56,4 @@ public class CrawlingController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
-    /**
-     * KOFIC 의 모든 영화 정보를 가져와 Index 저장
-     */
-    @GetMapping("/kofic")
-    public void crawlingKOFIC() {
-        koficService.startCrawling();
-    }
-
 }
