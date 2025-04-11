@@ -131,7 +131,7 @@ public class FcmService {
                     long offset = 0;
                     switch (usersAlarmTimings[i]) {
                         case AlarmTiming.ONE_DAY -> offset = 1;
-                        case AlarmTiming.THR_DAY -> offset = 2;
+                        case AlarmTiming.THR_DAY -> offset = 3;
                         case AlarmTiming.SEV_DAY -> offset = 7;
                         case AlarmTiming.TEN_DAY -> offset = 10;
                     }
