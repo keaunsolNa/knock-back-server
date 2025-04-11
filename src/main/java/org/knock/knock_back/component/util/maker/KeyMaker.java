@@ -38,7 +38,6 @@ public class KeyMaker {
         catch (NoSuchAlgorithmException e)
         {
             logger.info(e.getMessage());
-
         }
 
         assert keyGen != null;

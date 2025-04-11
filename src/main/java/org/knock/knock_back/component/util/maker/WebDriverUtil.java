@@ -23,7 +23,6 @@ import java.util.UUID;
  * 그렇기에 해당 컴포넌트는 Bean 등록하지 않는다.
  */
 public class WebDriverUtil {
-
     private static final Logger logger = LoggerFactory.getLogger(WebDriverUtil.class);
     /**
      * ChromeDriver 옵션 지정 및 생성
