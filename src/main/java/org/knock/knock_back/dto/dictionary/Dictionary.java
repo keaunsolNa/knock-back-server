@@ -1,5 +1,9 @@
 package org.knock.knock_back.dto.dictionary;
 
+/**
+ * @author nks
+ * @apiNote 닉네임 자동 생성을 위한 형용사, 동물이름 사전
+ */
 public class Dictionary {
 
     public String[] adjective = new String[]

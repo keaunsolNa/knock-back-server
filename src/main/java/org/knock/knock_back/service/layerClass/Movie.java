@@ -50,7 +50,6 @@ public class Movie implements MovieInterface {
         Set<MOVIE_INDEX> movieIndices = translation.MovieDtoToIndex(movies);
         movieMaker.recreateMovies(movieIndices);
 
-        // Step 3: 사용자 구독 리스트 업데이트
         Iterable<SSO_USER_INDEX> users = ssoUserRepository.findAll();
         Set<String> newMovieIds = movieIndices.stream().map(MOVIE_INDEX::getMovieId).collect(Collectors.toSet());
 

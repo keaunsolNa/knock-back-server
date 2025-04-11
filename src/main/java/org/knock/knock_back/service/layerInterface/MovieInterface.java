@@ -13,6 +13,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * @author nks
+ * @apiNote MOVIE 관련 인터페이스, 
+ * MOVIE-INDEX 관련 CRUD 작업 정의
+ */
 public interface MovieInterface {
 
     class MovieMaker {

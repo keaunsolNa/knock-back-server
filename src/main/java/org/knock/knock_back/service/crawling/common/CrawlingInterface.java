@@ -18,6 +18,9 @@ import java.util.Objects;
 /**
  * @author nks
  * @apiNote 영화 크롤링을 위한 Interface, 추상 메서드를 정의한다.
+ * 각각의 크롤링 서비스들은 반드시 해당 클래스를 상속받아 구현해야 한다.
+ * 해당 클래스를 통해 WebDriver 와 같은 무거운 객체를 싱글턴 패턴으로 생성하고 재활용한다. 
+ * synchronized 를 통해 멀티스레드 방식 유지
  */
 @Service
 public interface CrawlingInterface {

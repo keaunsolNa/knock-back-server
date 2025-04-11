@@ -23,6 +23,12 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * @author nks
+ * @apiNote 영화 크롤링 서비스를 시행하는 구체 클래스
+ * 추상 클래스를 상속 받은 뒤 해당 클래스의 메서드들을 구체화한다.
+ * 각각의 벤더별 요소를 로컬 기반 - application.yml , 배포 환경 기반 - heroku config 에 맞춰 시행한다.
+ */
 @Service
 public class CrawlingService extends AbstractCrawlingService {
 
@@ -190,15 +196,11 @@ public class CrawlingService extends AbstractCrawlingService {
 
         String srcPath = Objects.requireNonNull(imgElement.first()).attr(currentConfig.getPosterExtract());
 
-        logger.info(currentConfig.getPosterExtract() + " : " + srcPath);
+        logger.info(" 추출 정보 {} ", currentConfig.getPosterExtract() + " : " + srcPath);
 
         if (srcPath.contains("//") && currentConfig.getName().equals("LOTTE")) {
             srcPath = srcPath.replace("//", "/");
         }
-//            InputStream in = URI.create(srcPath).toURL().openStream();
-//
-//            byte[] imageBytes = in.readAllBytes();
-//            String base64 = Base64.getEncoder().encodeToString(imageBytes);
         dto.setPosterBase64(srcPath);
 
     }

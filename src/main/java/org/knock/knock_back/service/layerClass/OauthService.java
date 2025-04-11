@@ -14,6 +14,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author nks
+ * @apiNote Oauth 관련 요청을 수행하는 Service
+ */
 @Service
 @RequiredArgsConstructor
 public class OauthService {

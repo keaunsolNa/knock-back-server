@@ -25,6 +25,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.*;
 
+/**
+ * @author nks
+ * @apiNote KOPIS (공연예술 통합전산망) openAPI 통해 영화 정보를 가져온다.
+ * 해당 정보는 multi thread 방식으로 작동
+ */
 @Service
 @RequiredArgsConstructor
 public class KOPIS {
@@ -91,7 +96,7 @@ public class KOPIS {
         try (ExecutorService executor = Executors.newFixedThreadPool(3)) {
             while (true) {
                 int currentPage = Integer.parseInt(paramMap.get("cpage"));
-                if (currentPage > 100) break;
+                if (currentPage > 200) break;
 
                 String url = REQUEST_URL + "?" + makeQueryString(paramMap);
                 List<String> mt20idList = fetchMt20idListFromXml(url);

@@ -30,6 +30,13 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * @author nks
+ * @apiNote 알림 전송을 위한 FcmService
+ * 스케쥴러를 통해 정해진 시간 (09.00 am) 에 알림설정을 한 유저에 한해
+ * 해당 유저가 구독한 대상의 개봉 시간이 알림 시간과 일치한다면
+ * SSO-USER-INDEX 에 저장된 디바이스 토큰으로 알림을 전송한다.
+ */
 @Service
 @RequiredArgsConstructor
 public class FcmService {
@@ -43,8 +50,9 @@ public class FcmService {
     @Value("${fcm.project-id}")
     private String projectId;
 
-
-    // 의존성 주입이 이루어진 후 초기화를 수행한다.
+    /**
+     * 의존성 주입이 이루어진 후 초기화를 수행한다.
+     */
     @PostConstruct
     public void initialize()
     {
@@ -77,7 +85,9 @@ public class FcmService {
         }
     }
 
-    // 받은 token 이용하여 fcm 보내는 메서드
+    /**
+     * 받은 token 이용하여 fcm 보내는 메서드
+     */
     public void sendMessageByToken(String token, String title, String msg) {
 
         try
@@ -99,7 +109,6 @@ public class FcmService {
 
     /**
      * 모든 유저의 구독 정보를 가져온 뒤, 해당 작품의 개봉시간이 알림 시간 이하일 경우 FCM 알림 발송
-     *
      */
     public void pushMsg() {
 
@@ -187,9 +196,7 @@ public class FcmService {
                                 }
                             }
                         }
-
                     }
-
                 }
             }
         }

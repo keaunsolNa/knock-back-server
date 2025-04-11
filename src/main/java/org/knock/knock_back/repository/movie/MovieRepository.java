@@ -14,5 +14,4 @@ import java.util.Optional;
 public interface MovieRepository extends ElasticsearchRepository<MOVIE_INDEX, String> {
 
     Optional<MOVIE_INDEX> findByMovieNm(String movieNm);
-    void deleteMOVIE_INDEXByOpeningTimeBefore(Long openingTime);
 }
