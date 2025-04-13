@@ -25,7 +25,7 @@ public class MOVIE_INDEX {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String movieId;                                                         // 영화 ID
+    private String _id;                                                         // 영화 ID
 
     @Field(type = FieldType.Text, analyzer = "nori", fielddata = true)
     private String movieNm;                                                         // 영화 제목
@@ -60,13 +60,13 @@ public class MOVIE_INDEX {
 
     @Builder
     public MOVIE_INDEX
-            (String movieId, String movieNm, Long openingTime, String KOFICCode,
+            (String _id, String movieNm, Long openingTime, String KOFICCode,
              String[] reservationLink, String posterBase64, String[] directors,
              String[] actors, String[] companyNm,  CategoryLevelOne categoryLevelOne,
              Iterable<CATEGORY_LEVEL_TWO_INDEX> categoryLevelTwo, Long runningTime,
              String plot, Set<String> favorites )
     {
-        this.movieId = movieId;
+        this._id = _id;
         this.movieNm = movieNm;
         this.openingTime = openingTime;
         this.KOFICCode = KOFICCode;
@@ -86,11 +86,11 @@ public class MOVIE_INDEX {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof MOVIE_INDEX movieINDEX)) return false;
-        return Objects.equals(KOFICCode, movieINDEX.KOFICCode) || Objects.equals(movieId, movieINDEX.movieId);
+        return Objects.equals(KOFICCode, movieINDEX.KOFICCode) || Objects.equals(_id, movieINDEX._id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(movieId, movieNm, openingTime, KOFICCode, Arrays.hashCode(reservationLink), posterBase64, Arrays.hashCode(directors), Arrays.hashCode(actors), Arrays.hashCode(companyNm), categoryLevelOne, categoryLevelTwo, runningTime, plot, favorites);
+        return Objects.hash(_id, movieNm, openingTime, KOFICCode, Arrays.hashCode(reservationLink), posterBase64, Arrays.hashCode(directors), Arrays.hashCode(actors), Arrays.hashCode(companyNm), categoryLevelOne, categoryLevelTwo, runningTime, plot, favorites);
     }
 }

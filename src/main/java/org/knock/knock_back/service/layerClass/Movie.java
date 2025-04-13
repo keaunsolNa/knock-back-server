@@ -51,7 +51,7 @@ public class Movie implements MovieInterface {
         movieMaker.recreateMovies(movieIndices);
 
         Iterable<SSO_USER_INDEX> users = ssoUserRepository.findAll();
-        Set<String> newMovieIds = movieIndices.stream().map(MOVIE_INDEX::getMovieId).collect(Collectors.toSet());
+        Set<String> newMovieIds = movieIndices.stream().map(MOVIE_INDEX::get_id).collect(Collectors.toSet());
 
         for (SSO_USER_INDEX user : users) {
             Set<String> userMovieIds = user.getSubscribeList().get(CategoryLevelOne.MOVIE);
@@ -127,13 +127,13 @@ public class Movie implements MovieInterface {
 
                     @SuppressWarnings("unchecked")
                     List<String> movies = (List<String>) innerMap.get("movies");
-                    movies.add(movie.getMovieId());
+                    movies.add(movie.get_id());
 
                 }
                 else
                 {
                     List<String> movies = new ArrayList<>();
-                    movies.add(movie.getMovieId());
+                    movies.add(movie.get_id());
 
                     Map<String, Object> innerMap = new HashMap<>();
                     innerMap.put("categoryId", category.getId());

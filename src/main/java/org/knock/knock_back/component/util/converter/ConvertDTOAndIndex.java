@@ -89,7 +89,7 @@ public class ConvertDTOAndIndex {
     {
 
         MOVIE_DTO dto = new MOVIE_DTO();
-        dto.setMovieId(index.getMovieId());
+        dto.setMovieId(index.get_id());
         dto.setMovieNm(index.getMovieNm());
         dto.setOpeningTime(stringDateConvertLongTimeStamp.Converter(index.getOpeningTime()));
         dto.setKOFICCode(index.getKOFICCode());
