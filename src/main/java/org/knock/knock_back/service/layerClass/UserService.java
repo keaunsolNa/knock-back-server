@@ -11,6 +11,7 @@ import org.knock.knock_back.dto.document.user.SSO_USER_INDEX;
 import org.knock.knock_back.dto.dto.movie.MOVIE_DTO;
 import org.knock.knock_back.dto.dto.performingArts.KOPIS_DTO;
 import org.knock.knock_back.dto.dto.user.SSO_USER_DTO;
+import org.knock.knock_back.repository.movie.KOFICRepository;
 import org.knock.knock_back.repository.movie.MovieRepository;
 import org.knock.knock_back.repository.performingArts.KOPISRepository;
 import org.knock.knock_back.repository.user.SSOUserRepository;
@@ -20,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author nks
@@ -33,6 +35,7 @@ public class UserService {
     private final ConvertDTOAndIndex convertDTOAndIndex;
     private final MovieRepository movieRepository;
     private final KOPISRepository kopisRepository;
+    private final KOFICRepository koficRepository;
     private final SSOUserRepository ssoUserRepository;
 
     /**
@@ -96,10 +99,14 @@ public class UserService {
     {
         try
         {
-
             SSO_USER_INDEX user = getCurrentUser();
 
-            return user.getSubscribeList().get(categoryLevelOne);
+            Set<String> targetList = user.getSubscribeList().get(categoryLevelOne);
+
+            return targetList
+                    .stream()
+                    .filter(id -> isOver(id, categoryLevelOne))
+                    .toList();
         }
 
         catch (Exception e)
@@ -133,7 +140,7 @@ public class UserService {
     }
 
     /**
-     * 카테고리 별 구독 목록을 가져온다.
+     * 카테고리 별 알림 타이밍을 가져온다.
      * @return string : 선호 카테고리
      */
     public String[] getUserAlarmTimings()
@@ -157,7 +164,7 @@ public class UserService {
     }
     
     /**
-     * 구독한다
+     * 구독 한다
      * @param categoryLevelOne : 구독할 대상의 종류
      * @param id : 변경할 대상의 id
      * @return boolean : 대상 영화 구독 성공 여부
@@ -182,7 +189,7 @@ public class UserService {
     }
 
     /**
-     * 구독 해지한다
+     * 구독 해지 한다
      * @param categoryLevelOne : 구독 해지할 대상의 종류
      * @param id : 변경할 대상의 id
      * @return boolean : 대상 영화 구독 해지 성공 여부
@@ -206,7 +213,7 @@ public class UserService {
     }
 
     /**
-     * 구독 확인한다.
+     * 구독 확인 한다.
      * @param categoryLevelOne : 구독 해지할 대상의 종류
      * @param id : 변경할 대상의 id
      * @return boolean : 대상 영화 구독 해지 성공 여부
@@ -227,7 +234,7 @@ public class UserService {
     }
 
     /**
-     * 유저의 선호 카테고리를 변경한다
+     * 유저의 선호 카테고리를 변경 한다
      * @param categoryName : 변경할 대상의 category
      * @return boolean : 대상 카테고리 변경 성공 여부
      */
@@ -452,7 +459,12 @@ public class UserService {
                 {
                     Iterable<MOVIE_INDEX> movies = movieRepository.findAllById(list);
                     set = new HashSet<>(convertDTOAndIndex.MovieIndexToDTO(movies));
-                } catch (Exception e)
+                    set = set.stream()
+                            .filter(dto -> isOver(dto.getMovieId(), CategoryLevelOne.MOVIE))
+                            .collect(Collectors.toSet());
+
+                } 
+                catch (Exception e)
                 {
                     logger.warn("카테고리 id 목록으로 영화 인덱스 객체 가져오기 중 에러 발생, {}", e.getMessage());
                 }
@@ -464,20 +476,18 @@ public class UserService {
             case CategoryLevelOne.PERFORMING_ARTS ->
             {
 
-                Set<KOPIS_DTO> set = new HashSet<>();
-                for (String id : list)
+                Set<KOPIS_DTO> set = Set.of();
+                try
                 {
-                    KOPIS_INDEX performingArtsIndex;
-                    try
-                    {
-                        performingArtsIndex = kopisRepository.findById(id).orElseThrow();
-                        set.add(convertDTOAndIndex.kopisIndexToKopisDTO(performingArtsIndex));
-
-                    } catch (Exception e)
-                    {
-                        logger.warn("카테고리 id 목록으로 영화 인덱스 객체 가져오기 중 에러 발생, {}", e.getMessage());
-                    }
-
+                    Iterable<KOPIS_INDEX> performingArts = kopisRepository.findAllById(list);
+                    set = new HashSet<>(convertDTOAndIndex.kopisIndexToKopisDTO(performingArts));
+                    set = set.stream()
+                            .filter(dto -> isOver(dto.getId(), CategoryLevelOne.PERFORMING_ARTS))
+                            .collect(Collectors.toSet());
+                }
+                catch (Exception e)
+                {
+                    logger.warn("카테고리 id 목록으로 공연예술 인덱스 객체 가져오기 중 에러 발생, {}", e.getMessage());
                 }
 
                 return set;
@@ -487,8 +497,34 @@ public class UserService {
         return null;
     }
 
-    private SSO_USER_INDEX getCurrentUser() {
+    private SSO_USER_INDEX getCurrentUser()
+    {
         return (SSO_USER_INDEX) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    private boolean isOver(String id, CategoryLevelOne category)
+    {
+        Date currentDate = new Date();
+        if (category.equals(CategoryLevelOne.MOVIE))
+        {
+
+            if (kopisRepository.findById(id).isPresent())
+            {
+                KOPIS_INDEX movieIndex = kopisRepository.findById(id).get();
+                return movieIndex.getFrom().before(currentDate) && movieIndex.getTo().after(currentDate);
+            }
+        }
+        else if (category.equals(CategoryLevelOne.PERFORMING_ARTS))
+        {
+
+            if (koficRepository.findById(id).isEmpty())
+            {
+                KOPIS_INDEX kopisIndex = kopisRepository.findById(id).get();
+                return kopisIndex.getFrom().before(currentDate) && kopisIndex.getTo().after(currentDate);
+            }
+        }
+
+        return false;
     }
 
 }

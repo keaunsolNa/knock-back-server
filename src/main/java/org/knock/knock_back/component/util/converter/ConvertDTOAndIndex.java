@@ -242,7 +242,7 @@ public class ConvertDTOAndIndex {
      * Iterable<KOPIS_INDEX> to Iterable<KOPIS_DTO>
      * @return Iterable<KOPIS_DTO>
      */
-    public Iterable<KOPIS_DTO> kopisIndexToKopisDTO(Iterable<KOPIS_INDEX> indexes) {
+    public List<KOPIS_DTO> kopisIndexToKopisDTO(Iterable<KOPIS_INDEX> indexes) {
         List<KOPIS_DTO> result = new ArrayList<>();
 
         for (KOPIS_INDEX innerIndex : indexes) {

@@ -128,12 +128,27 @@ public class PerformingArtsService {
 
     public Iterable<KOPIS_DTO> getRecommend(String performingArtsId) {
 
+        long epochMillis = LocalDate.now()
+                .atStartOfDay(ZoneId.systemDefault())  // 시스템 기본 타임존 기준 변환
+                .toInstant()
+                .toEpochMilli();
+
         NativeQuery query = NativeQuery.builder()
                 .withQuery(q -> q.bool(b -> b
                         .must(Query.of(t -> t.match(m -> m
                                 .field("subscribeList.PERFORMING_ARTS") // ✅ text 타입이므로 match 사용
                                 .query(performingArtsId)
                         )))
+                        .must(Query.of(f -> f.range(r -> r
+                                .date(builder -> builder
+                                        .field("from")
+                                        .lte(String.valueOf(epochMillis))
+                                ))))
+                        .must(Query.of(f -> f.range(r -> r
+                                .date(builder -> builder
+                                        .field("to")
+                                        .gte(String.valueOf(epochMillis))
+                                ))))
                 ))
                 .withSort(SortOptions.of(s -> s
                         .field(f -> f
