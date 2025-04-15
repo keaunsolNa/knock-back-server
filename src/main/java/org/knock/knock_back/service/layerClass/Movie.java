@@ -5,8 +5,6 @@ import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import lombok.extern.slf4j.Slf4j;
 import org.knock.knock_back.dto.Enum.CategoryLevelOne;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
@@ -35,7 +33,6 @@ public class Movie implements MovieInterface {
     private final ConvertDTOAndIndex translation;
     private final ElasticsearchOperations elasticsearchOperations;
     private final MovieRepository movieRepository;
-    private static final Logger logger = LoggerFactory.getLogger(Movie.class);
 
     public Movie(ConvertDTOAndIndex translation,
                  ElasticsearchOperations elasticsearchOperations, MovieRepository movieRepository) {
@@ -47,7 +44,10 @@ public class Movie implements MovieInterface {
 
     public Iterable<MOVIE_DTO> readMovies() {
 
-        return translation.MovieIndexToDTO(movieMaker.readAllMovie());
+        return translation.MovieIndexToDTO(movieMaker.readAllMovie())
+                .stream()
+                .filter(dto -> isOver(dto.getMovieId()))
+                .toList();
     }
 
     public MOVIE_DTO readMoviesDetail(String id) {
@@ -59,7 +59,6 @@ public class Movie implements MovieInterface {
     public Map<String, Object> getCategory()
     {
         Map<String, Map<String, Object>> categoryMap = new HashMap<>();
-        logger.info("[{}]", movieMaker.readAllMovie());
         Iterable<MOVIE_INDEX> iter = movieMaker.readAllMovie();
 
         for (MOVIE_INDEX movie : iter)
@@ -69,11 +68,9 @@ public class Movie implements MovieInterface {
             for (CATEGORY_LEVEL_TWO_INDEX category : movie.getCategoryLevelTwo())
             {
 
-                logger.info("category [{}]", category);
                 if (categoryMap.containsKey(category.getNm()))
                 {
                     Map<String, Object> innerMap = categoryMap.get(category.getNm());
-                    logger.info("innerMap In1 [{}]", innerMap);
                     @SuppressWarnings("unchecked")
                     List<String> movies = (List<String>) innerMap.get("movies");
                     movies.add(movie.getId());
@@ -85,7 +82,6 @@ public class Movie implements MovieInterface {
                     movies.add(movie.getId());
 
                     Map<String, Object> innerMap = new HashMap<>();
-                    logger.info("innerMap In2 [{}]", innerMap);
                     innerMap.put("categoryId", category.getId());
                     innerMap.put("categoryNm", category.getNm());
                     innerMap.put("movies", movies);
@@ -147,4 +143,16 @@ public class Movie implements MovieInterface {
 
     }
 
+    private boolean isOver(String id)
+    {
+        Long currentDate = System.currentTimeMillis();
+
+
+        if (movieRepository.findById(id).isPresent())
+        {
+            MOVIE_INDEX movieIndex = movieRepository.findById(id).get();
+            return movieIndex.getOpeningTime() < currentDate;
+        }
+        return false;
+    }
 }

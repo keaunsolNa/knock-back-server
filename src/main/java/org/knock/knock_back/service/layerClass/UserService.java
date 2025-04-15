@@ -199,13 +199,8 @@ public class UserService {
         try
         {
             SSO_USER_INDEX user = getCurrentUser();
-            logger.info("=================1==============");
-            logger.info(id);
-            logger.info("================2===============");
             user.getSubscribeList().get(categoryLevelOne).remove(id);
-            logger.info("================3===============");
             ssoUserRepository.save(user);
-            logger.info("================4===============");
             return CategoryLevelOneUpdate(categoryLevelOne, id, user.getId(), false);
         }
 
