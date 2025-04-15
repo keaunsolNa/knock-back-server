@@ -5,25 +5,23 @@ import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import lombok.extern.slf4j.Slf4j;
 import org.knock.knock_back.dto.Enum.CategoryLevelOne;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 import org.knock.knock_back.component.util.converter.ConvertDTOAndIndex;
 import org.knock.knock_back.dto.document.category.CATEGORY_LEVEL_TWO_INDEX;
-import org.knock.knock_back.dto.document.movie.KOFIC_INDEX;
 import org.knock.knock_back.dto.document.movie.MOVIE_INDEX;
 import org.knock.knock_back.dto.document.user.SSO_USER_INDEX;
 import org.knock.knock_back.dto.dto.movie.MOVIE_DTO;
 import org.knock.knock_back.repository.movie.MovieRepository;
-import org.knock.knock_back.repository.user.SSOUserRepository;
 import org.knock.knock_back.service.layerInterface.MovieInterface;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static org.knock.knock_back.service.crawling.common.CrawlingInterface.logger;
 
 /**
  * @author nks
@@ -35,36 +33,16 @@ public class Movie implements MovieInterface {
 
     private final MovieMaker movieMaker;
     private final ConvertDTOAndIndex translation;
-    private final SSOUserRepository ssoUserRepository;
     private final ElasticsearchOperations elasticsearchOperations;
     private final MovieRepository movieRepository;
+    private static final Logger logger = LoggerFactory.getLogger(Movie.class);
 
     public Movie(ConvertDTOAndIndex translation,
-                 SSOUserRepository ssoUserRepository,
                  ElasticsearchOperations elasticsearchOperations, MovieRepository movieRepository) {
-        this.ssoUserRepository = ssoUserRepository;
-        this.movieMaker = new MovieMaker(movieRepository, elasticsearchOperations);
+        this.movieMaker = new MovieMaker(movieRepository);
         this.translation = translation;
         this.elasticsearchOperations = elasticsearchOperations;
         this.movieRepository = movieRepository;
-    }
-
-    public void createMovie(Set<MOVIE_DTO> movies) {
-
-        Set<MOVIE_INDEX> movieIndices = translation.MovieDtoToIndex(movies);
-        movieMaker.recreateMovies(movieIndices);
-
-        Iterable<SSO_USER_INDEX> users = ssoUserRepository.findAll();
-        Set<String> newMovieIds = movieIndices.stream().map(MOVIE_INDEX::get_id).collect(Collectors.toSet());
-
-        for (SSO_USER_INDEX user : users) {
-            Set<String> userMovieIds = user.getSubscribeList().get(CategoryLevelOne.MOVIE);
-            if (userMovieIds != null) {
-                userMovieIds.retainAll(newMovieIds); // 신규 ID에 없는 건 제거
-            }
-        }
-
-        ssoUserRepository.saveAll(users);
     }
 
     public Iterable<MOVIE_DTO> readMovies() {
@@ -72,51 +50,17 @@ public class Movie implements MovieInterface {
         return translation.MovieIndexToDTO(movieMaker.readAllMovie());
     }
 
-    public Optional<MOVIE_INDEX> checkMovie(String movieNm) { return movieMaker.readMovieByNm(movieNm); }
-
     public MOVIE_DTO readMoviesDetail(String id) {
 
         MOVIE_INDEX movies = movieMaker.readMovieById(id);
         return translation.MovieIndexToDTO(movies);
     }
 
-    public KOFIC_INDEX similaritySearch (String movieNm) throws Exception
-    {
-        SearchHits<KOFIC_INDEX> searchHits = movieMaker.searchKOFICByMovieNm(movieNm);
-
-        if (searchHits.getTotalHits() - 1 > 1 &&
-                searchHits.getSearchHit(0).getScore() == searchHits.getSearchHit(1).getScore()) {
-            throw new Exception("_score 동점");
-        }
-        try
-        {
-            return Objects.requireNonNull(searchHits.stream().findFirst().orElse(null)).getContent();
-        }
-        catch (NullPointerException e)
-        {
-            return null;
-        }
-    }
-
-    public KOFIC_INDEX similaritySearch (String movieNm, String directorNm)
-    {
-        SearchHits<KOFIC_INDEX> searchHits = movieMaker.searchKOFICByMovieNmAndDirectorNm(movieNm, directorNm);
-
-        try
-        {
-            return Objects.requireNonNull(searchHits.stream().findFirst().orElse(null)).getContent();
-        }
-        catch (NullPointerException e)
-        {
-            return null;
-        }
-    }
-
     public Map<String, Object> getCategory()
     {
         Map<String, Map<String, Object>> categoryMap = new HashMap<>();
         logger.info("[{}]", movieMaker.readAllMovie());
-        List<MOVIE_INDEX> iter = movieMaker.readAllMovie();
+        Iterable<MOVIE_INDEX> iter = movieMaker.readAllMovie();
 
         for (MOVIE_INDEX movie : iter)
         {

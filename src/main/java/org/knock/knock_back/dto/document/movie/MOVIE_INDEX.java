@@ -13,9 +13,8 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.knock.knock_back.dto.Enum.CategoryLevelOne;
 import org.knock.knock_back.dto.document.category.CATEGORY_LEVEL_TWO_INDEX;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -35,15 +34,15 @@ public class MOVIE_INDEX {
 
     private String KOFICCode;                                                       // 영화 KOFIC 코드
 
-    private String[] reservationLink;                                               // 영화 예매 링크
+    private List<String> reservationLink;                                               // 영화 예매 링크
 
     private String posterBase64;                                                    // 영화 포스터
 
-    private String[] directors;                                                     // 영화 감독
+    private List<String> directors;                                                     // 영화 감독
 
-    private String[] actors;                                                        // 영화 배우
+    private List<String> actors;                                                        // 영화 배우
 
-    private String[] companyNm;                                                     // 영화 제작사
+    private List<String> companyNm;                                                     // 영화 제작사
 
     @Enumerated(EnumType.STRING)
     private CategoryLevelOne categoryLevelOne;                                      // 상위 장르 (MOVIE)
@@ -56,15 +55,15 @@ public class MOVIE_INDEX {
     
     private String plot;                                                            // 영화 줄거리
 
-    private Set<String> favorites;                                                  // 영화 구독자
+    private List<String> favorites;                                                  // 영화 구독자
 
     @Builder
     public MOVIE_INDEX
             (String _id, String movieNm, Long openingTime, String KOFICCode,
-             String[] reservationLink, String posterBase64, String[] directors,
-             String[] actors, String[] companyNm,  CategoryLevelOne categoryLevelOne,
+             List<String> reservationLink, String posterBase64, List<String> directors,
+             List<String> actors, List<String> companyNm,  CategoryLevelOne categoryLevelOne,
              Iterable<CATEGORY_LEVEL_TWO_INDEX> categoryLevelTwo, Long runningTime,
-             String plot, Set<String> favorites )
+             String plot, List<String> favorites )
     {
         this._id = _id;
         this.movieNm = movieNm;
@@ -87,10 +86,5 @@ public class MOVIE_INDEX {
         if (this == o) return true;
         if (!(o instanceof MOVIE_INDEX movieINDEX)) return false;
         return Objects.equals(KOFICCode, movieINDEX.KOFICCode) || Objects.equals(_id, movieINDEX._id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(_id, movieNm, openingTime, KOFICCode, Arrays.hashCode(reservationLink), posterBase64, Arrays.hashCode(directors), Arrays.hashCode(actors), Arrays.hashCode(companyNm), categoryLevelOne, categoryLevelTwo, runningTime, plot, favorites);
     }
 }

@@ -13,6 +13,8 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.knock.knock_back.dto.Enum.CategoryLevelOne;
 import org.knock.knock_back.dto.document.category.CATEGORY_LEVEL_TWO_INDEX;
 
+import java.util.List;
+
 @Getter
 @Setter
 @ToString
@@ -34,11 +36,11 @@ public class KOFIC_INDEX {
     @Field(type = FieldType.Date, format = DateFormat.epoch_millis)
     private Long openingTime;                                               // KOFIC 영화 개봉연도
 
-    private String[] directors;                                             // KOFIC 영화 감독
+    private List<String> directors;                                             // KOFIC 영화 감독
 
-    private String[] actors;                                                // KOFIC 영화 배우
+    private List<String> actors;                                                // KOFIC 영화 배우
 
-    private String[] companyNm;                                             // KOFIC 영화 제작사
+    private List<String> companyNm;                                             // KOFIC 영화 제작사
 
     @Enumerated(EnumType.STRING)
     private CategoryLevelOne categoryLevelOne;                              // 카테고리 (MOVIE)
@@ -52,8 +54,8 @@ public class KOFIC_INDEX {
     @Builder
     public KOFIC_INDEX
             (String KOFICCode, String movieNm,
-             Long prdtYear, Long openingTime, String[] directors,
-             String[] companyNm, CategoryLevelOne categoryLevelOne,
+             Long prdtYear, Long openingTime, List<String> directors,
+             List<String> companyNm, CategoryLevelOne categoryLevelOne,
              Iterable<CATEGORY_LEVEL_TWO_INDEX> categoryLevelTwo)
     {
         this.KOFICCode = KOFICCode;

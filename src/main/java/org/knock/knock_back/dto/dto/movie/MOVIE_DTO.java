@@ -4,7 +4,7 @@ import lombok.Data;
 import org.knock.knock_back.dto.Enum.CategoryLevelOne;
 import org.knock.knock_back.dto.dto.category.CATEGORY_LEVEL_TWO_DTO;
 
-import java.util.Set;
+import java.util.List;
 
 @Data
 public class MOVIE_DTO {
@@ -13,16 +13,16 @@ public class MOVIE_DTO {
     private String movieNm;
     private String openingTime;
     private String KOFICCode;
-    private String[] reservationLink;
+    private List<String> reservationLink;
     private String posterBase64;
-    private String[] directors;
-    private String[] actors;
-    private String[] companyNm;
+    private List<String> directors;
+    private List<String> actors;
+    private List<String> companyNm;
     private CategoryLevelOne categoryLevelOne;
     private Iterable<CATEGORY_LEVEL_TWO_DTO> categoryLevelTwo;
     private Long runningTime;
     private String plot;
-    private Set<String> favorites;
+    private List<String> favorites;
     private Integer favoritesCount;
     private String img;
 

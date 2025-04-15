@@ -407,7 +407,7 @@ public class UserService {
 
                 if (null == movieIndex.getFavorites() || movieIndex.getFavorites().isEmpty())
                 {
-                    movieIndex.setFavorites(new HashSet<>());
+                    movieIndex.setFavorites(new ArrayList<>());
                 }
 
                 if (flag) movieIndex.getFavorites().add(userId);

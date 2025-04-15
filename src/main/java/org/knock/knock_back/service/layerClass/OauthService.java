@@ -66,6 +66,7 @@ public class OauthService {
         return socialOauth.requestUserInfo(accessToken);
 
     }
+
     private SocialOauth findSocialOauthByType(SocialLoginType socialLoginType) {
         return socialOauthList.stream()
                 .filter(x -> x.type() == socialLoginType)
