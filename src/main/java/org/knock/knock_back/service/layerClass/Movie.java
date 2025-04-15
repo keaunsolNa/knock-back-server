@@ -112,8 +112,9 @@ public class Movie implements MovieInterface {
     {
         Map<String, Map<String, Object>> categoryMap = new HashMap<>();
 
-        Iterable<MOVIE_INDEX> iter = movieMaker.readAllMovie();
+        List<MOVIE_INDEX> iter = movieMaker.readAllMovie();
 
+        System.out.println(iter);
         for (MOVIE_INDEX movie : iter)
         {
 
