@@ -7,7 +7,6 @@ import org.knock.knock_back.dto.dto.user.SSO_USER_DTO;
 import org.springframework.stereotype.Component;
 import org.knock.knock_back.dto.Enum.CategoryLevelOne;
 import org.knock.knock_back.dto.document.category.CATEGORY_LEVEL_TWO_INDEX;
-import org.knock.knock_back.dto.document.movie.KOFIC_INDEX;
 import org.knock.knock_back.dto.document.movie.MOVIE_INDEX;
 import org.knock.knock_back.dto.dto.category.CATEGORY_LEVEL_TWO_DTO;
 import org.knock.knock_back.dto.dto.movie.MOVIE_DTO;
@@ -89,7 +88,7 @@ public class ConvertDTOAndIndex {
     {
 
         MOVIE_DTO dto = new MOVIE_DTO();
-        dto.setMovieId(index.get_id());
+        dto.setMovieId(index.getId());
         dto.setMovieNm(index.getMovieNm());
         dto.setOpeningTime(stringDateConvertLongTimeStamp.Converter(index.getOpeningTime()));
         dto.setKOFICCode(index.getKOFICCode());
@@ -122,28 +121,6 @@ public class ConvertDTOAndIndex {
         return dto;
     }
 
-
-    /**
-     * KOFIC INDEX -> MOVIE DTO
-     *
-     * @param index 변환할 KOFIC 객체
-     * @return SET<MOVIE_INDEX> 반환할 MOVIE_INDEX 객체
-     */
-    public MOVIE_DTO koficIndexToMovieDTO(KOFIC_INDEX index) {
-
-        MOVIE_DTO dto = new MOVIE_DTO();
-
-        dto.setMovieId(index.getMovieId());
-        dto.setMovieNm(index.getMovieNm());
-        dto.setOpeningTime(stringDateConvertLongTimeStamp.Converter(index.getOpeningTime()));
-        dto.setKOFICCode(index.getKOFICCode());
-        dto.setDirectors(index.getDirectors());
-        dto.setActors(index.getActors());
-        dto.setCompanyNm(index.getCompanyNm());
-        dto.setCategoryLevelTwo(null == index.getCategoryLevelTwo() ? null : CLTIndexToCLTDTO(index.getCategoryLevelTwo()));
-        dto.setRunningTime(null == index.getRunningTime() ? 0 : index.getRunningTime());
-        return dto;
-    }
 
     /**
      * CATEGORY_LEVEL_TWO INDEX -> CATEGORY_LEVEL_TWO DTO

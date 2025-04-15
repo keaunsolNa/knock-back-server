@@ -24,7 +24,7 @@ public class MOVIE_INDEX {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String _id;                                                         // 영화 ID
+    private String id;                                                         // 영화 ID
 
     @Field(type = FieldType.Text, analyzer = "nori", fielddata = true)
     private String movieNm;                                                         // 영화 제목
@@ -59,13 +59,13 @@ public class MOVIE_INDEX {
 
     @Builder
     public MOVIE_INDEX
-            (String _id, String movieNm, Long openingTime, String KOFICCode,
+            (String id, String movieNm, Long openingTime, String KOFICCode,
              List<String> reservationLink, String posterBase64, List<String> directors,
              List<String> actors, List<String> companyNm,  CategoryLevelOne categoryLevelOne,
              Iterable<CATEGORY_LEVEL_TWO_INDEX> categoryLevelTwo, Long runningTime,
              String plot, List<String> favorites )
     {
-        this._id = _id;
+        this.id = id;
         this.movieNm = movieNm;
         this.openingTime = openingTime;
         this.KOFICCode = KOFICCode;
@@ -85,6 +85,6 @@ public class MOVIE_INDEX {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof MOVIE_INDEX movieINDEX)) return false;
-        return Objects.equals(KOFICCode, movieINDEX.KOFICCode) || Objects.equals(_id, movieINDEX._id);
+        return Objects.equals(KOFICCode, movieINDEX.KOFICCode) || Objects.equals(id, movieINDEX.id);
     }
 }

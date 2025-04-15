@@ -76,13 +76,13 @@ public class Movie implements MovieInterface {
                     logger.info("innerMap In1 [{}]", innerMap);
                     @SuppressWarnings("unchecked")
                     List<String> movies = (List<String>) innerMap.get("movies");
-                    movies.add(movie.get_id());
+                    movies.add(movie.getId());
 
                 }
                 else
                 {
                     List<String> movies = new ArrayList<>();
-                    movies.add(movie.get_id());
+                    movies.add(movie.getId());
 
                     Map<String, Object> innerMap = new HashMap<>();
                     logger.info("innerMap In2 [{}]", innerMap);
