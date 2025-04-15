@@ -11,6 +11,7 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.knock.knock_back.dto.Enum.CategoryLevelOne;
 
+import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -33,11 +34,11 @@ public class CATEGORY_LEVEL_TWO_INDEX {
     private CategoryLevelOne parentNm;                                  // 상위 장르 이름 (EX; MOVIE, PERFORMING_ARTS 등)
 
     @ManyToMany
-    private Iterable<String> favoriteUsers;                             // 해당 장르 선호 인원
+    private List<String> favoriteUsers;                             // 해당 장르 선호 인원
 
     @Builder
     @PersistenceCreator
-    public CATEGORY_LEVEL_TWO_INDEX(String id, String nm, CategoryLevelOne parentNm, Iterable<String> favoriteUsers)
+    public CATEGORY_LEVEL_TWO_INDEX(String id, String nm, CategoryLevelOne parentNm, List<String> favoriteUsers)
     {
         this.id = id;
         this.nm = nm;
