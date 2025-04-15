@@ -3,6 +3,7 @@ package org.knock.knock_back.service.layerClass;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import lombok.extern.slf4j.Slf4j;
 import org.knock.knock_back.dto.Enum.CategoryLevelOne;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -22,10 +23,13 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.knock.knock_back.service.crawling.common.CrawlingInterface.logger;
+
 /**
  * @author nks
  * @apiNote Movie 요청을 수행하는 Service
  */
+@Slf4j
 @Service
 public class Movie implements MovieInterface {
 
@@ -111,10 +115,9 @@ public class Movie implements MovieInterface {
     public Map<String, Object> getCategory()
     {
         Map<String, Map<String, Object>> categoryMap = new HashMap<>();
-
+        logger.info("[{}]", movieMaker.readAllMovie());
         List<MOVIE_INDEX> iter = movieMaker.readAllMovie();
 
-        System.out.println(iter);
         for (MOVIE_INDEX movie : iter)
         {
 
@@ -122,10 +125,11 @@ public class Movie implements MovieInterface {
             for (CATEGORY_LEVEL_TWO_INDEX category : movie.getCategoryLevelTwo())
             {
 
+                logger.info("category [{}]", category);
                 if (categoryMap.containsKey(category.getNm()))
                 {
                     Map<String, Object> innerMap = categoryMap.get(category.getNm());
-
+                    logger.info("innerMap In1 [{}]", innerMap);
                     @SuppressWarnings("unchecked")
                     List<String> movies = (List<String>) innerMap.get("movies");
                     movies.add(movie.get_id());
@@ -137,6 +141,7 @@ public class Movie implements MovieInterface {
                     movies.add(movie.get_id());
 
                     Map<String, Object> innerMap = new HashMap<>();
+                    logger.info("innerMap In2 [{}]", innerMap);
                     innerMap.put("categoryId", category.getId());
                     innerMap.put("categoryNm", category.getNm());
                     innerMap.put("movies", movies);
