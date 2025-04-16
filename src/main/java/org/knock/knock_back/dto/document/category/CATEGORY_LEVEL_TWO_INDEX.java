@@ -1,4 +1,5 @@
 package org.knock.knock_back.dto.document.category;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,6 +23,7 @@ public class CATEGORY_LEVEL_TWO_INDEX {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonProperty("_id") //
     private String id;                                                  // 장르 ID
 
     @Field(type = FieldType.Text, analyzer = "nori", fielddata = true)

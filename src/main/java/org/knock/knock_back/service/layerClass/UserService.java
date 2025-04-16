@@ -103,11 +103,6 @@ public class UserService {
 
             Set<String> targetList = user.getSubscribeList().get(categoryLevelOne);
 
-            logger.info("targetList {} ", targetList);
-            logger.info("stream {} ", targetList
-                    .stream()
-                    .filter(id -> isOver(id, categoryLevelOne))
-                    .toList());
             return targetList
                     .stream()
                     .filter(id -> isOver(id, categoryLevelOne))
@@ -274,7 +269,6 @@ public class UserService {
         try
         {
 
-            logger.info("[{}]", alarmValues);
             SSO_USER_INDEX user = getCurrentUser();
 
             int idx = categoryLevelOne.equals(CategoryLevelOne.MOVIE) ? 0
