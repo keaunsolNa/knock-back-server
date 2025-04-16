@@ -43,8 +43,8 @@ public class PerformingArtsService {
 
     public Iterable<KOPIS_DTO> readPerformingArts() {
 
-        long epochMillis = LocalDate.now()
-                .atStartOfDay(ZoneId.systemDefault())  // 시스템 기본 타임존 기준 변환
+        long epochMillis = LocalDate.now(ZoneId.of("Asia/Seoul"))
+                .atStartOfDay(ZoneId.of("Asia/Seoul"))
                 .toInstant()
                 .toEpochMilli();
 
@@ -128,8 +128,8 @@ public class PerformingArtsService {
 
     public Iterable<KOPIS_DTO> getRecommend(String performingArtsId) {
 
-        long epochMillis = LocalDate.now()
-                .atStartOfDay(ZoneId.systemDefault())  // 시스템 기본 타임존 기준 변환
+        long epochMillis = LocalDate.now(ZoneId.of("Asia/Seoul"))
+                .atStartOfDay(ZoneId.of("Asia/Seoul"))
                 .toInstant()
                 .toEpochMilli();
 
@@ -179,8 +179,8 @@ public class PerformingArtsService {
 
     public Iterable<KOPIS_DTO> readPerformingArtsByCategoryLevelTwo(String categoryNm) {
 
-        long epochMillis = LocalDate.now()
-                .atStartOfDay(ZoneId.systemDefault())  // 시스템 기본 타임존 기준 변환
+        long epochMillis = LocalDate.now(ZoneId.of("Asia/Seoul"))
+                .atStartOfDay(ZoneId.of("Asia/Seoul"))
                 .toInstant()
                 .toEpochMilli();
 

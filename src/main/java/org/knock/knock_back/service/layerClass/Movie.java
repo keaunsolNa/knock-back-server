@@ -104,8 +104,8 @@ public class Movie implements MovieInterface {
     public List<MOVIE_DTO> getRecommend (String movieId)
     {
 
-        long epochMillis = LocalDate.now()
-                .atStartOfDay(ZoneId.systemDefault())  // 시스템 기본 타임존 기준 변환
+        long epochMillis = LocalDate.now(ZoneId.of("Asia/Seoul"))
+                .atStartOfDay(ZoneId.of("Asia/Seoul"))
                 .toInstant()
                 .toEpochMilli();
 
@@ -157,8 +157,8 @@ public class Movie implements MovieInterface {
 
     private boolean isOver(String id)
     {
-        Long currentDate = LocalDate.now()
-                .atStartOfDay(ZoneId.systemDefault())  // 시스템 기본 타임존 기준 변환
+        long currentDate = LocalDate.now(ZoneId.of("Asia/Seoul"))
+                .atStartOfDay(ZoneId.of("Asia/Seoul"))
                 .toInstant()
                 .toEpochMilli();
 

@@ -511,8 +511,8 @@ public class UserService {
 
         if (category.equals(CategoryLevelOne.MOVIE))
         {
-            Long currentUnixTime = LocalDate.now()
-                    .atStartOfDay(ZoneId.systemDefault())  // 시스템 기본 타임존 기준 변환
+            long currentUnixTime = LocalDate.now(ZoneId.of("Asia/Seoul"))
+                    .atStartOfDay(ZoneId.of("Asia/Seoul"))
                     .toInstant()
                     .toEpochMilli();
             if (movieRepository.findById(id).isPresent())
