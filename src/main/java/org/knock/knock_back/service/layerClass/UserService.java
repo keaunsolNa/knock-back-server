@@ -11,7 +11,6 @@ import org.knock.knock_back.dto.document.user.SSO_USER_INDEX;
 import org.knock.knock_back.dto.dto.movie.MOVIE_DTO;
 import org.knock.knock_back.dto.dto.performingArts.KOPIS_DTO;
 import org.knock.knock_back.dto.dto.user.SSO_USER_DTO;
-import org.knock.knock_back.repository.movie.KOFICRepository;
 import org.knock.knock_back.repository.movie.MovieRepository;
 import org.knock.knock_back.repository.performingArts.KOPISRepository;
 import org.knock.knock_back.repository.user.SSOUserRepository;
@@ -37,7 +36,6 @@ public class UserService {
     private final ConvertDTOAndIndex convertDTOAndIndex;
     private final MovieRepository movieRepository;
     private final KOPISRepository kopisRepository;
-    private final KOFICRepository koficRepository;
     private final SSOUserRepository ssoUserRepository;
 
     /**
@@ -105,6 +103,11 @@ public class UserService {
 
             Set<String> targetList = user.getSubscribeList().get(categoryLevelOne);
 
+            logger.info("targetList {} ", targetList);
+            logger.info("stream {} ", targetList
+                    .stream()
+                    .filter(id -> isOver(id, categoryLevelOne))
+                    .toList());
             return targetList
                     .stream()
                     .filter(id -> isOver(id, categoryLevelOne))
