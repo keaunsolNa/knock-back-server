@@ -83,6 +83,9 @@ public class Movie implements MovieInterface {
                     List<String> movies = new ArrayList<>();
                     movies.add(movie.getId());
 
+                    log.info("CATEGORY : {}", category);
+                    log.info(category.getId());
+
                     Map<String, Object> innerMap = new HashMap<>();
                     innerMap.put("categoryId", category.getId());
                     innerMap.put("categoryNm", category.getNm());
