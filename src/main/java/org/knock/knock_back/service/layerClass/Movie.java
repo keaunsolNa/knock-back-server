@@ -17,6 +17,8 @@ import org.knock.knock_back.dto.dto.movie.MOVIE_DTO;
 import org.knock.knock_back.repository.movie.MovieRepository;
 import org.knock.knock_back.service.layerInterface.MovieInterface;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -102,6 +104,11 @@ public class Movie implements MovieInterface {
     public List<MOVIE_DTO> getRecommend (String movieId)
     {
 
+        long epochMillis = LocalDate.now()
+                .atStartOfDay(ZoneId.systemDefault())  // 시스템 기본 타임존 기준 변환
+                .toInstant()
+                .toEpochMilli();
+
         /*
          *  movieId를 좋아하는 user 집합
          *  해당 user 들이 좋아하는, parameter movieId를 제외한 영화들
@@ -114,6 +121,11 @@ public class Movie implements MovieInterface {
                                 .field("subscribeList.MOVIE") // ✅ text 타입이므로 match 사용
                                 .query(movieId)
                         )))
+                        .must(Query.of(f -> f.range(r -> r
+                                .date(builder -> builder
+                                        .field("openingTime")
+                                        .gte(String.valueOf(epochMillis))
+                                ))))
                 ))
                 .withSort(SortOptions.of(s -> s
                         .field(f -> f
@@ -145,13 +157,15 @@ public class Movie implements MovieInterface {
 
     private boolean isOver(String id)
     {
-        Long currentDate = System.currentTimeMillis();
-
+        Long currentDate = LocalDate.now()
+                .atStartOfDay(ZoneId.systemDefault())  // 시스템 기본 타임존 기준 변환
+                .toInstant()
+                .toEpochMilli();
 
         if (movieRepository.findById(id).isPresent())
         {
             MOVIE_INDEX movieIndex = movieRepository.findById(id).get();
-            return movieIndex.getOpeningTime() < currentDate;
+            return movieIndex.getOpeningTime() >= currentDate;
         }
         return false;
     }

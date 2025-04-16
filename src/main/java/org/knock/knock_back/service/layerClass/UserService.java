@@ -20,6 +20,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -503,20 +505,23 @@ public class UserService {
 
     private boolean isOver(String id, CategoryLevelOne category)
     {
-        Date currentDate = new Date();
+
         if (category.equals(CategoryLevelOne.MOVIE))
         {
-
-            if (kopisRepository.findById(id).isPresent())
+            Long currentUnixTime = LocalDate.now()
+                    .atStartOfDay(ZoneId.systemDefault())  // 시스템 기본 타임존 기준 변환
+                    .toInstant()
+                    .toEpochMilli();
+            if (movieRepository.findById(id).isPresent())
             {
-                KOPIS_INDEX movieIndex = kopisRepository.findById(id).get();
-                return movieIndex.getFrom().before(currentDate) && movieIndex.getTo().after(currentDate);
+                MOVIE_INDEX movieIndex = movieRepository.findById(id).get();
+                return movieIndex.getOpeningTime() >= currentUnixTime;
             }
         }
         else if (category.equals(CategoryLevelOne.PERFORMING_ARTS))
         {
-
-            if (koficRepository.findById(id).isEmpty())
+            Date currentDate = new Date();
+            if (kopisRepository.findById(id).isPresent())
             {
                 KOPIS_INDEX kopisIndex = kopisRepository.findById(id).get();
                 return kopisIndex.getFrom().before(currentDate) && kopisIndex.getTo().after(currentDate);
