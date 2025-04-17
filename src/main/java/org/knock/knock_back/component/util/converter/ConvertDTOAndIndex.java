@@ -1,5 +1,6 @@
 package org.knock.knock_back.component.util.converter;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.knock.knock_back.dto.document.performingArts.KOPIS_INDEX;
 import org.knock.knock_back.dto.document.user.SSO_USER_INDEX;
 import org.knock.knock_back.dto.dto.performingArts.KOPIS_DTO;
@@ -115,7 +116,7 @@ public class ConvertDTOAndIndex {
         dto.setCategoryLevelOne(index.getCategoryLevelOne());
         dto.setCategoryLevelTwo(null == index.getCategoryLevelTwo() ? null : CLTIndexToCLTDTO(index.getCategoryLevelTwo()));
         dto.setRunningTime(index.getRunningTime());
-        dto.setPlot(index.getPlot());
+        dto.setPlot(StringEscapeUtils.unescapeHtml4(index.getPlot()));
         dto.setFavorites(index.getFavorites());
         dto.setFavoritesCount(null == index.getFavorites() || index.getFavorites().isEmpty() ? 0 : index.getFavorites().size());
         return dto;
