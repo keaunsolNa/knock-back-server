@@ -6,7 +6,6 @@ import org.knock.knock_back.dto.document.user.SSO_USER_INDEX;
 import org.knock.knock_back.dto.dto.performingArts.KOPIS_DTO;
 import org.knock.knock_back.dto.dto.user.SSO_USER_DTO;
 import org.springframework.stereotype.Component;
-import org.knock.knock_back.dto.Enum.CategoryLevelOne;
 import org.knock.knock_back.dto.document.category.CATEGORY_LEVEL_TWO_INDEX;
 import org.knock.knock_back.dto.document.movie.MOVIE_INDEX;
 import org.knock.knock_back.dto.dto.category.CATEGORY_LEVEL_TWO_DTO;
@@ -27,38 +26,6 @@ public class ConvertDTOAndIndex {
         this.stringDateConvertLongTimeStamp = stringDateConvertLongTimeStamp;
     }
 
-    /**
-     * MOVIE DTO -> INDEX
-     * @param dtos 변환할 MOVIE_DTO 객체
-     * @return SET<MOVIE_INDEX> 반환할 MOVIE_INDEX 객체
-     */
-    public Set<MOVIE_INDEX> MovieDtoToIndex(Iterable<MOVIE_DTO> dtos) {
-
-        Set<MOVIE_INDEX> result = new HashSet<>();
-        for (MOVIE_DTO dto : dtos) {
-
-            MOVIE_INDEX index =
-                    new MOVIE_INDEX(
-                            dto.getMovieId()
-                            , dto.getMovieNm()
-                            , stringDateConvertLongTimeStamp.Converter(dto.getOpeningTime())
-                            , dto.getKOFICCode()
-                            , dto.getReservationLink()
-                            , dto.getPosterBase64()
-                            , dto.getDirectors()
-                            , dto.getActors()
-                            , dto.getCompanyNm()
-                            , CategoryLevelOne.MOVIE
-                            , dto.getCategoryLevelTwo() == null ? null : CLTDtoToCLTIndex(dto.getCategoryLevelTwo())
-                            , dto.getRunningTime()
-                            , dto.getPlot()
-                            , dto.getFavorites()
-                    );
-            result.add(index);
-        }
-
-        return result;
-    }
 
     /**
      * MOVIE INDEX -> DTO
@@ -116,7 +83,25 @@ public class ConvertDTOAndIndex {
         dto.setCategoryLevelOne(index.getCategoryLevelOne());
         dto.setCategoryLevelTwo(null == index.getCategoryLevelTwo() ? null : CLTIndexToCLTDTO(index.getCategoryLevelTwo()));
         dto.setRunningTime(index.getRunningTime());
-        dto.setPlot(StringEscapeUtils.unescapeHtml4(index.getPlot()));
+
+        String text = StringEscapeUtils.unescapeHtml4(index.getPlot());
+
+        // <br>, <br/>, <br /> → 줄바꿈
+        text = text.replaceAll("(?i)<br\\s*/?>", "\n");
+
+        // &nbsp; → 공백
+        text = text.replaceAll("&nbsp;", " ");
+
+        // <b>태그 → 제거 (단순히 태그만 없애고 내용은 유지)
+        text = text.replaceAll("(?i)</?b>", "");
+
+        // 기타 자주 쓰는 단순 태그 제거 (<i>, <em>, <u> 등)
+        text = text.replaceAll("(?i)</?(i|em|u|strong|span)>", "");
+
+        // 여러 줄바꿈 연속 → 2줄까지만 유지
+        text = text.replaceAll("(?m)\n{3,}", "\n\n");
+
+        dto.setPlot(text);
         dto.setFavorites(index.getFavorites());
         dto.setFavoritesCount(null == index.getFavorites() || index.getFavorites().isEmpty() ? 0 : index.getFavorites().size());
         return dto;
@@ -142,33 +127,6 @@ public class ConvertDTOAndIndex {
             dto.setParentNm(innerIndex.getParentNm());
 
             result.add(dto);
-        }
-
-
-        return result;
-    }
-
-    /**
-     * CATEGORY_LEVEL_TWO DTO -> CATEGORY_LEVEL_TWO INDEX
-     *
-     * @param dto 변환할 CATEGORY_LEVEL_TWO 객체
-     * @return Set<CATEGORY_LEVEL_TWO> 반환할 CATEGORY_LEVEL_TWO INDEX 객체
-     */
-    public Set<CATEGORY_LEVEL_TWO_INDEX> CLTDtoToCLTIndex(Iterable<CATEGORY_LEVEL_TWO_DTO> dto) {
-
-        Set<CATEGORY_LEVEL_TWO_INDEX> result = new HashSet<>();
-
-        for (CATEGORY_LEVEL_TWO_DTO innerDto : dto) {
-
-            CATEGORY_LEVEL_TWO_INDEX index =
-                    new CATEGORY_LEVEL_TWO_INDEX
-                            (
-                                    innerDto.getId()
-                                    , innerDto.getNm()
-                                    , innerDto.getParentNm()
-                                    , innerDto.getFavoriteUsers()
-                            );
-            result.add(index);
         }
 
 
