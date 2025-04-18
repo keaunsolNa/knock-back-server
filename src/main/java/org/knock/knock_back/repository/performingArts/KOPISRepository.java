@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
  * @apiNote KOPIS Index 위한 Repository
  */
 @Repository
-public interface KOPISRepository extends ElasticsearchRepository<KOPIS_INDEX, String>
-{
-    Iterable<KOPIS_INDEX> findByPrfState(PrfState prfState);
+public interface KOPISRepository extends ElasticsearchRepository<KOPIS_INDEX, String> {
+	Iterable<KOPIS_INDEX> findByPrfState(PrfState prfState);
 }

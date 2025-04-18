@@ -1,13 +1,15 @@
 package org.knock.knock_back.component.filter;
 
-import jakarta.servlet.*;
+import java.io.IOException;
+
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.io.IOException;
 
 /**
  * @author nks
@@ -16,13 +18,14 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class EncodingFilter extends OncePerRequestFilter {
 
-    @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
+	@Override
+	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+		@NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        if("POST".equals(request.getMethod())) {
-            request.setCharacterEncoding("UTF-8");
-        }
+		if ("POST".equals(request.getMethod())) {
+			request.setCharacterEncoding("UTF-8");
+		}
 
-        filterChain.doFilter(request, response);
-    }
+		filterChain.doFilter(request, response);
+	}
 }

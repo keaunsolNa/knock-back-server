@@ -11,10 +11,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum CategoryLevelOne {
 
-    MOVIE,
-    PERFORMING_ARTS,
-    EXHIBITION,
-    MY_PAGE,
-    BOARD
+	MOVIE,
+	PERFORMING_ARTS,
+	EXHIBITION,
+	MY_PAGE,
+	BOARD
 
 }

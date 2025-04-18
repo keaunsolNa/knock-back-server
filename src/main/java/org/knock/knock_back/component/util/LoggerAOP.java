@@ -16,63 +16,63 @@ import org.springframework.util.StopWatch;
 @Configuration
 public class LoggerAOP {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Around("execution(* org.knock.knock_back.controller..*(..))")
-    public Object ControllerTimerLogger(ProceedingJoinPoint joinPoint) throws Throwable {
+	@Around("execution(* org.knock.knock_back.controller..*(..))")
+	public Object ControllerTimerLogger(ProceedingJoinPoint joinPoint) throws Throwable {
 
-        logger.info("Entering ControllerTimerLogger");
+		logger.info("Entering ControllerTimerLogger");
 
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
 
-        Object result = joinPoint.proceed();
+		Object result = joinPoint.proceed();
 
-        stopWatch.stop();
+		stopWatch.stop();
 
-        logger.info("{} Controller took {} ms", joinPoint.getSignature().getName(), stopWatch.getTotalTimeMillis());
+		logger.info("{} Controller took {} ms", joinPoint.getSignature().getName(), stopWatch.getTotalTimeMillis());
 
-        logger.info("Exiting ControllerTimerLogger");
+		logger.info("Exiting ControllerTimerLogger");
 
-        return result;
-    }
+		return result;
+	}
 
-    @Around("execution(* org.knock.knock_back.service..*(..))")
-    public Object ServiceTimerLogger(ProceedingJoinPoint joinPoint) throws Throwable {
+	@Around("execution(* org.knock.knock_back.service..*(..))")
+	public Object ServiceTimerLogger(ProceedingJoinPoint joinPoint) throws Throwable {
 
-        logger.info("Entering ServiceTimerLogger");
+		logger.info("Entering ServiceTimerLogger");
 
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
 
-        Object result = joinPoint.proceed();
+		Object result = joinPoint.proceed();
 
-        stopWatch.stop();
+		stopWatch.stop();
 
-        logger.info("{} Service took {} ms", joinPoint.getSignature().getName(), stopWatch.getTotalTimeMillis());
+		logger.info("{} Service took {} ms", joinPoint.getSignature().getName(), stopWatch.getTotalTimeMillis());
 
-        logger.info("Exiting ServiceTimerLogger");
+		logger.info("Exiting ServiceTimerLogger");
 
-        return result;
-    }
+		return result;
+	}
 
-    @Around("execution(* org.knock.knock_back.component.filter..*(..))")
-    public Object FilterTimerLogger(ProceedingJoinPoint joinPoint) throws Throwable {
+	@Around("execution(* org.knock.knock_back.component.filter..*(..))")
+	public Object FilterTimerLogger(ProceedingJoinPoint joinPoint) throws Throwable {
 
-        logger.info("Entering FilterTimerLogger");
+		logger.info("Entering FilterTimerLogger");
 
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
 
-        Object result = joinPoint.proceed();
+		Object result = joinPoint.proceed();
 
-        stopWatch.stop();
+		stopWatch.stop();
 
-        logger.info("{} Filter took {} ms", joinPoint.getSignature().getName(), stopWatch.getTotalTimeMillis());
+		logger.info("{} Filter took {} ms", joinPoint.getSignature().getName(), stopWatch.getTotalTimeMillis());
 
-        logger.info("Exiting FilterTimerLogger");
+		logger.info("Exiting FilterTimerLogger");
 
-        return result;
-    }
+		return result;
+	}
 
 }

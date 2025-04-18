@@ -11,6 +11,7 @@ For any licenses that require the disclosure of source code, the source code
 can be found at https://github.com/newrelic/.
 
 ## Content
+
 * [ASM](#asm)
 * [Apache Commons CLI](#apache-commons-cli)
 * [Apache Commons Codec](#apache-commons-codec)
@@ -35,9 +36,10 @@ can be found at https://github.com/newrelic/.
 * [SnakeYAML](#snakeyaml)
 
 ## ASM
+
 This product includes [ASM](https://asm.ow2.io), which is released under the following license(s):
-    ASM (BSD-3) <http://asm.ow2.org/license.html>
-    
+ASM (BSD-3) <http://asm.ow2.org/license.html>
+
 ```
 ASM: a very small and fast Java bytecode manipulation framework
 Copyright (c) 2000-2011 INRIA, France Telecom
@@ -69,8 +71,10 @@ THE POSSIBILITY OF SUCH DAMAGE.
 ```
 
 ## Apache Commons CLI
-This product includes [Apache Commons CLI](https://commons.apache.org/proper/commons-cli/), which is released under the following license(s):
-    Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
+
+This product includes [Apache Commons CLI](https://commons.apache.org/proper/commons-cli/), which is released under the
+following license(s):
+Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
 
 ```
  Apache Commons CLI
@@ -81,8 +85,10 @@ This product includes [Apache Commons CLI](https://commons.apache.org/proper/com
 ```
 
 ## Apache Commons Codec
-This product includes [Apache Commons Codec](http://commons.apache.org/proper/commons-codec/), which is released under the following license(s):
-    Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
+
+This product includes [Apache Commons Codec](http://commons.apache.org/proper/commons-codec/), which is released under
+the following license(s):
+Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
 
 ```
 Apache Commons Codec
@@ -105,8 +111,10 @@ Copyright (c) 2008 Alexander Beider & Stephen P. Morse.
 ```
 
 ## Apache Commons Lang
-This product includes [Apache Commons Lang](http://commons.apache.org/proper/commons-lang/), which is released under the following license(s):
-    Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
+
+This product includes [Apache Commons Lang](http://commons.apache.org/proper/commons-lang/), which is released under the
+following license(s):
+Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
 
 ```
 Apache Commons Lang
@@ -116,10 +124,11 @@ This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
 ```
 
-
 ## Apache Commons Logging
-This product includes [Apache Commons Logging](http://commons.apache.org/proper/commons-logging/), which is released under the following license(s):
-    Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
+
+This product includes [Apache Commons Logging](http://commons.apache.org/proper/commons-logging/), which is released
+under the following license(s):
+Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
 
 ```
 Apache Commons Logging
@@ -130,8 +139,10 @@ The Apache Software Foundation (http://www.apache.org/).
 ```
 
 ## Caffeine
-This product includes [Caffeine](https://github.com/ben-manes/caffeine), which is released under the following license(s):
-    Apache License 2.0 <https://github.com/ben-manes/caffeine/blob/master/LICENSE>
+
+This product includes [Caffeine](https://github.com/ben-manes/caffeine), which is released under the following license(
+s):
+Apache License 2.0 <https://github.com/ben-manes/caffeine/blob/master/LICENSE>
 
 ```
 
@@ -339,9 +350,10 @@ This product includes [Caffeine](https://github.com/ben-manes/caffeine), which i
 
 ```
 
-
 ## Checker Qual Annotations
-This product include [Checker Qual Annotations](https://checkerframework.org/manual/#license), which is released under the following license(s): The MIT License
+
+This product include [Checker Qual Annotations](https://checkerframework.org/manual/#license), which is released under
+the following license(s): The MIT License
 
 ```
 MIT License:
@@ -366,8 +378,9 @@ THE SOFTWARE.
 ```
 
 ## Guava
+
 This product includes [Guava](https://github.com/google/guava), which is released under the following license(s):
-    Apache License 2.0 <https://github.com/google/guava/blob/master/COPYING>
+Apache License 2.0 <https://github.com/google/guava/blob/master/COPYING>
 
 ```
                                  Apache License
@@ -574,8 +587,10 @@ This product includes [Guava](https://github.com/google/guava), which is release
 ```
 
 ## HttpClient
-This product includes [HttpClient](https://hc.apache.org/httpcomponents-client-4.5.x/index.html), which is released under the following license(s):
-    Apache License 2.0 <https://hc.apache.org/httpcomponents-client-4.5.x/licenses.html>
+
+This product includes [HttpClient](https://hc.apache.org/httpcomponents-client-4.5.x/index.html), which is released
+under the following license(s):
+Apache License 2.0 <https://hc.apache.org/httpcomponents-client-4.5.x/licenses.html>
 
 ```
 Apache HttpClient
@@ -586,9 +601,10 @@ The Apache Software Foundation (http://www.apache.org/).
 ```
 
 ## JRegex
+
 This product includes [JRegex](http://jregex.sourceforge.net/), which is released under the following license(s):
-    BSD-3 <https://www.telit.com/securewise-eula/jregex-license/>
-    
+BSD-3 <https://www.telit.com/securewise-eula/jregex-license/>
+
 ```
 Jregex License
 
@@ -611,8 +627,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 ```
 
 ## JSON.simple
-This product includes [JSON.simple](https://github.com/fangyidong/json-simple), which is released under the following license(s):
-    Apache License 2.0 <https://github.com/fangyidong/json-simple/blob/master/LICENSE.txt>
+
+This product includes [JSON.simple](https://github.com/fangyidong/json-simple), which is released under the following
+license(s):
+Apache License 2.0 <https://github.com/fangyidong/json-simple/blob/master/LICENSE.txt>
 
 ```
                                  Apache License
@@ -819,8 +837,9 @@ This product includes [JSON.simple](https://github.com/fangyidong/json-simple), 
 ```
 
 ## Log4J
+
 This product includes [Log4J](https://logging.apache.org/log4j/2.x/), which is released under the following license(s):
-    Apache License 2.0 <https://logging.apache.org/log4j/2.x/license.html>
+Apache License 2.0 <https://logging.apache.org/log4j/2.x/license.html>
 
 ```
 Apache Log4j Core
@@ -834,9 +853,10 @@ Copyright 2005-2006 Tim Fennell
 ```
 
 ## SLF4J
+
 This product includes [SLF4J](https://www.slf4j.org/), which is released under the following license(s):
-    The MIT License (MIT) <http://opensource.org/licenses/MIT>
- 
+The MIT License (MIT) <http://opensource.org/licenses/MIT>
+
  ```
  Copyright (c) 2004-2017 QOS.ch All rights reserved. 
  
@@ -859,8 +879,10 @@ This product includes [SLF4J](https://www.slf4j.org/), which is released under t
 ```
 
 ## SnakeYAML
-This product includes [SnakeYAML](https://bitbucket.org/asomov/snakeyaml), which is released under the following license(s):
-    Apache License 2.0 <https://bitbucket.org/asomov/snakeyaml/src/default/LICENSE.txt>
+
+This product includes [SnakeYAML](https://bitbucket.org/asomov/snakeyaml), which is released under the following
+license(s):
+Apache License 2.0 <https://bitbucket.org/asomov/snakeyaml/src/default/LICENSE.txt>
 
 ```
                                  Apache License
@@ -1069,8 +1091,8 @@ This product includes [SnakeYAML](https://bitbucket.org/asomov/snakeyaml), which
 ## Gson
 
 This product includes 'Gson', which is released under the following license(s):
-    Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
-    
+Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
+
 ```
 Copyright 2008 Google Inc.
 
@@ -1088,9 +1110,10 @@ limitations under the License.
 ```
 
 ## gRPC
+
 This product includes 'gRPC', which is released under the following license(s):
-    Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
-    
+Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
+
 ```
 Copyright 2014 The gRPC Authors
 
@@ -1142,10 +1165,11 @@ an open source universal data plane API, which can be obtained at:
   * LOCATION_IN_GRPC:
     * xds/third_party/udpa
 ```
+
 ## Harmony
 
 This product includes 'Apache Harmony', which is released under the following license(s):
-    Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
+Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
 
 ```
                                  Apache License
@@ -1352,8 +1376,9 @@ This product includes 'Apache Harmony', which is released under the following li
 ```
 
 ## Netty
+
 This product includes 'Netty', which is released under the following license(s):
-    Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
+Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
 
 ```
                             The Netty Project
@@ -1607,7 +1632,8 @@ This private header is also used by Apple's open source
 
 ## New Relic Security Agent
 
-This product includes [New Relic Security Agent](https://github.com/newrelic/csec-java-agent), which is released under the following license(s):
+This product includes [New Relic Security Agent](https://github.com/newrelic/csec-java-agent), which is released under
+the following license(s):
 New Relic Pre-Release Software Notice <https://github.com/newrelic/csec-java-agent/blob/main/LICENSE.md>
 
 ```
@@ -1680,7 +1706,7 @@ terms of the license covering any OSS component, the source code can be requeste
 ## OkHttp
 
 This product includes 'OkHttp', which is released under the following license(s):
-    Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
+Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
 
 ```
 Copyright 2019 Square, Inc.
@@ -1701,7 +1727,7 @@ limitations under the License.
 ## Okio
 
 This product includes 'Okio', which is released under the following license(s):
-    Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
+Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
 
 ```
 Copyright 2013 Square, Inc.
@@ -1722,6 +1748,7 @@ limitations under the License.
 ## Protobuf
 
 This product includes 'Protobuf Support Library', which is released under the following license:
+
 ```
 Copyright 2008 Google Inc.  All rights reserved.
 

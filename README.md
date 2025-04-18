@@ -19,26 +19,26 @@ PWA 클라이언트와의 통신을 담당합니다.
 
 ## 🛠️ 기술 스택
 
-| 영역          | 스택 / 기술                 |
-|---------------|-----------------------------|
-| 언어          | Java 17                     |
-| 프레임워크    | Spring Boot, Spring Security|
-| 인증          | JWT (HttpOnly + Secure 쿠키)|
-| 알림 시스템   | Firebase Cloud Messaging    |
-| 데이터 저장   | Elasticsearch (Bonsai)      |
-| 배포          | Heroku (Web Dyno)           |
+| 영역     | 스택 / 기술                      |
+|--------|------------------------------|
+| 언어     | Java 17                      |
+| 프레임워크  | Spring Boot, Spring Security |
+| 인증     | JWT (HttpOnly + Secure 쿠키)   |
+| 알림 시스템 | Firebase Cloud Messaging     |
+| 데이터 저장 | Elasticsearch (Bonsai)       |
+| 배포     | Heroku (Web Dyno)            |
 
 ---
 
 ## 🧩 주요 기능
 
-| 기능 | 설명 |
-|------|------|
+| 기능         | 설명                                 |
+|------------|------------------------------------|
 | 🔐 SSO 로그인 | 카카오 / 구글 / 네이버 OAuth2 로그인 (JWT 발급) |
-| 📅 구독 / 알림 | 개봉일 디데이 기준 푸시 알림 예약, 구독/취소 기능 |
-| 🔎 콘텐츠 검색 | 영화 및 공연예술 Elasticsearch 기반 검색 |
-| 🧠 추천 알고리즘 | 사용자 관심 기반 추천 콘텐츠 제공 |
-| 📬 푸시 발송 | Firebase를 통한 디바이스 기반 푸시 발송 |
+| 📅 구독 / 알림 | 개봉일 디데이 기준 푸시 알림 예약, 구독/취소 기능      |
+| 🔎 콘텐츠 검색  | 영화 및 공연예술 Elasticsearch 기반 검색      |
+| 🧠 추천 알고리즘 | 사용자 관심 기반 추천 콘텐츠 제공                |
+| 📬 푸시 발송   | Firebase를 통한 디바이스 기반 푸시 발송         |
 
 ---
 
@@ -93,9 +93,9 @@ Heroku에 설정된 값과 동일한 환경을 `.env` 또는 시스템 환경 �
 - **플랫폼**: Heroku (Web Dyno)
 - **스토리지**: Elasticsearch (Bonsai Addon)
 - **외부 연동**:
-  - `knock_crawling`: 콘텐츠 크롤링
-  - FCM: 푸시 알림 전송
-  - OAuth2: SSO 인증 (카카오, 구글, 네이버)
+    - `knock_crawling`: 콘텐츠 크롤링
+    - FCM: 푸시 알림 전송
+    - OAuth2: SSO 인증 (카카오, 구글, 네이버)
 
 ---
 
@@ -109,8 +109,8 @@ Heroku에 설정된 값과 동일한 환경을 `.env` 또는 시스템 환경 �
 
 ## 🧑‍💻 개발자
 
-| 이름   | 역할               | GitHub |
-|--------|--------------------|--------|
+| 이름  | 역할              | GitHub                                       |
+|-----|-----------------|----------------------------------------------|
 | 나큰솔 | 백엔드 / API 서버 개발 | [@keaunsolNa](https://github.com/keaunsolNa) |
 
 ---

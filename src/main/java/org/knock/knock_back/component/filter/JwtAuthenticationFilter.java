@@ -1,5 +1,14 @@
 package org.knock.knock_back.component.filter;
 
+import java.io.IOException;
+
+import org.knock.knock_back.component.config.JwtTokenProvider;
+import org.knock.knock_back.component.util.maker.TokenMaker;
+import org.knock.knock_back.dto.document.user.SSO_USER_INDEX;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.filter.OncePerRequestFilter;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -7,14 +16,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.knock.knock_back.component.util.maker.TokenMaker;
-import org.knock.knock_back.dto.document.user.SSO_USER_INDEX;
-import org.knock.knock_back.component.config.JwtTokenProvider;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.io.IOException;
 
 /**
  * @author nks
@@ -23,77 +24,76 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final TokenMaker tokenMaker = new TokenMaker();
+	private static final TokenMaker tokenMaker = new TokenMaker();
 
-    private final JwtTokenProvider jwtTokenProvider;
+	private final JwtTokenProvider jwtTokenProvider;
 
-    @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
+	@Override
+	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+		@NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        // Logout 관련 처리
-        if (request.getRequestURI().equals("/auth/logout")) return;
-        
-        // 헤더에서 Refresh Token 가쟈오기
-        String token = jwtTokenProvider.resolveToken(request);
+		// Logout 관련 처리
+		if (request.getRequestURI().equals("/auth/logout"))
+			return;
 
-        // Refresh Token 이 없거나 만료되었다면
-        if (token == null || !jwtTokenProvider.validateToken(token)) {
+		// 헤더에서 Refresh Token 가쟈오기
+		String token = jwtTokenProvider.resolveToken(request);
 
-            // AccessToken 탐색
-            token = jwtTokenProvider.resolveAccessToken(request);
+		// Refresh Token 이 없거나 만료되었다면
+		if (token == null || !jwtTokenProvider.validateToken(token)) {
 
-            // AccessToken 도 없거나 만료되었다면 login 창으로 redirect
-            if (token == null || !jwtTokenProvider.validateToken(token)) {
-                if (!response.isCommitted()) {
-                    response.sendError(401);
-                }
-            }
+			// AccessToken 탐색
+			token = jwtTokenProvider.resolveAccessToken(request);
 
-            // AccessToken 만료되지 않았다면
-            else
-            {
-                // AccessToken 에서 유저 정보 가져온 뒤 RefreshToken 재 발급
-                SSO_USER_INDEX userIndex = null;
-                try
-                {
-                    userIndex = jwtTokenProvider.getUserDetails(token);
-                }
-                // NPE 시 계정 정보가 없으므로 재 로그인 요청
-                catch (NullPointerException e)
-                {
-                    response.resetBuffer();
-                    if (!response.isCommitted()) {
-                        response.sendError(401);
-                    }
-                }
+			// AccessToken 도 없거나 만료되었다면 login 창으로 redirect
+			if (token == null || !jwtTokenProvider.validateToken(token)) {
+				if (!response.isCommitted()) {
+					response.sendError(401);
+				}
+			}
 
-                String refreshTokenValue = jwtTokenProvider.generateRefreshToken(userIndex);
+			// AccessToken 만료되지 않았다면
+			else {
+				// AccessToken 에서 유저 정보 가져온 뒤 RefreshToken 재 발급
+				SSO_USER_INDEX userIndex = null;
+				try {
+					userIndex = jwtTokenProvider.getUserDetails(token);
+				}
+				// NPE 시 계정 정보가 없으므로 재 로그인 요청
+				catch (NullPointerException e) {
+					response.resetBuffer();
+					if (!response.isCommitted()) {
+						response.sendError(401);
+					}
+				}
 
-                Cookie refreshTokenForKnock = new Cookie("refreshTokenForKnock", refreshTokenValue);
+				String refreshTokenValue = jwtTokenProvider.generateRefreshToken(userIndex);
 
-                tokenMaker.makeRefreshToken(response, refreshTokenForKnock);
+				Cookie refreshTokenForKnock = new Cookie("refreshTokenForKnock", refreshTokenValue);
 
-                response.addCookie(refreshTokenForKnock);
+				tokenMaker.makeRefreshToken(response, refreshTokenForKnock);
 
-            }
-        }
+				response.addCookie(refreshTokenForKnock);
 
-        // 유효한 토큰인지 확인.
-        if (jwtTokenProvider.validateToken(token)) {
+			}
+		}
 
-            // 토큰이 유효하면 토큰으로부터 유저 정보를 받아오기.
-            Authentication authentication = jwtTokenProvider.getAuthentication(token);
+		// 유효한 토큰인지 확인.
+		if (jwtTokenProvider.validateToken(token)) {
 
-            // SecurityContext 에 Authentication 객체를 저장.
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+			// 토큰이 유효하면 토큰으로부터 유저 정보를 받아오기.
+			Authentication authentication = jwtTokenProvider.getAuthentication(token);
 
-            filterChain.doFilter(request, response);
+			// SecurityContext 에 Authentication 객체를 저장.
+			SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            return;
-        }
+			filterChain.doFilter(request, response);
 
-        if (!response.isCommitted()) {
-            response.sendError(401);
-        }
-    }
+			return;
+		}
+
+		if (!response.isCommitted()) {
+			response.sendError(401);
+		}
+	}
 }

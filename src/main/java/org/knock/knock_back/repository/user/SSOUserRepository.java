@@ -1,8 +1,8 @@
 package org.knock.knock_back.repository.user;
 
+import org.knock.knock_back.dto.document.user.SSO_USER_INDEX;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.stereotype.Repository;
-import org.knock.knock_back.dto.document.user.SSO_USER_INDEX;
 
 /**
  * @author nks
