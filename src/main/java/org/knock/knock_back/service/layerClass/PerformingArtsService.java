@@ -65,7 +65,7 @@ public class PerformingArtsService {
 				.filter(Query.of(f -> f.range(r -> r
 					.date(builder -> builder
 						.field("to")
-						.lte(String.valueOf(epochMillis)) // 현재 날짜보다 크거나 같은 to
+						.gte(String.valueOf(epochMillis)) // 현재 날짜보다 크거나 같은 to
 					))))
 			))
 			.withSort(SortOptions.of(s -> s
@@ -144,7 +144,7 @@ public class PerformingArtsService {
 				.must(Query.of(f -> f.range(r -> r
 					.date(builder -> builder
 						.field("from")
-						.lte(String.valueOf(epochMillis))
+						.gte(String.valueOf(epochMillis))
 					))))
 				.must(Query.of(f -> f.range(r -> r
 					.date(builder -> builder
@@ -194,7 +194,7 @@ public class PerformingArtsService {
 				.must(Query.of(f -> f.range(r -> r
 					.date(builder -> builder
 						.field("from")
-						.lte(String.valueOf(epochMillis))
+						.gte(String.valueOf(epochMillis))
 					))))
 				.must(Query.of(f -> f.range(r -> r
 					.date(builder -> builder

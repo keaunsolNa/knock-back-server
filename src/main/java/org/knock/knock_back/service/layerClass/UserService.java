@@ -461,7 +461,7 @@ public class UserService {
 			Date currentDate = new Date();
 			if (kopisRepository.findById(id).isPresent()) {
 				KOPIS_INDEX kopisIndex = kopisRepository.findById(id).get();
-				return kopisIndex.getFrom().before(currentDate) && kopisIndex.getTo().after(currentDate);
+				return kopisIndex.getFrom().after(currentDate) && kopisIndex.getTo().after(currentDate);
 			}
 		}
 
