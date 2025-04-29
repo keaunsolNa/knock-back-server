@@ -207,7 +207,6 @@ public class PerformingArtsService {
 					.field("from")
 					.order(SortOrder.Asc)
 				)))
-			.withMaxResults(18)
 			.build();
 
 		SearchHits<KOPIS_INDEX> kopis = elasticsearchOperations.search(query, KOPIS_INDEX.class);
