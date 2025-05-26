@@ -6,8 +6,6 @@ import org.knock.knock_back.dto.dto.movie.MOVIE_DTO;
 import org.knock.knock_back.service.layerClass.Movie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,17 +47,6 @@ public class MovieController {
 		return ResponseEntity.ok(movieService.readMoviesDetail(movieId));
 	}
 
-	/**
-	 * 노션 용 테스트
-	 * @param payload
-	 * @return
-	 */
-	@PostMapping("/test")
-	public ResponseEntity<String> receiveFromNotion(@RequestBody Map<String, Object> payload) {
-		System.out.println("🚀 받은 데이터: " + payload);
-		return ResponseEntity.ok("✅ 데이터 수신 완료");
-	}
-	
 	/**
 	 * 요청 시 현재 상영 예정작 영화에 있는 모든 LEVEL_TWO CATEGORY 정보를 가져와 반환
 	 *
